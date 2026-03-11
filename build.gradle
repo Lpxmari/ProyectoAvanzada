@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'co.edu.uniquindio'
+version = '0.0.1-SNAPSHOT'
+description = 'ProyectoAvanzada'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Para exponer la API REST
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Para la persistencia de datos y mapeo objeto-relacional (ORM)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Base de datos en memoria para pruebas
+    runtimeOnly 'com.h2database:h2'
+    // Lombok (Opcional) para generar Getters, Setters y Constructores
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
