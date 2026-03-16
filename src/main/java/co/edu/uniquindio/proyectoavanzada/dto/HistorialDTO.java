@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class HistorialDTO {
     private Long idHistorial;
     private LocalDateTime fechaHora;

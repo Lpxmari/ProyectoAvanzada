@@ -9,6 +9,7 @@ import co.edu.uniquindio.proyectoavanzada.repositories.HistorialRepository;
 import co.edu.uniquindio.proyectoavanzada.repositories.ResponsableRepository;
 import co.edu.uniquindio.proyectoavanzada.repositories.SolicitudRepository;
 import co.edu.uniquindio.proyectoavanzada.services.SolicitudService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -96,20 +97,39 @@ public class SolicitudServiceImpl implements SolicitudService {
 
         historialRepository.save(h);
 
-        //solicitud.setResponsableAsignado(responsable);
+        solicitud.setResponsableAsignado(responsable);
         solicitud.setEstado(EstadoSolicitud.EN_ATENCION);
 
         return solicitudRepository.save(solicitud);
     }
 
     @Override
+    @Transactional
     public void cerrarSolicitud(Long id) {
-        Solicitud solicitud = solicitudRepository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("No se puede cerrar: solicitud inexistente"));
-
+        Solicitud solicitud = obtenerPorId(id);
         solicitud.setEstado(EstadoSolicitud.CERRADA);
         solicitud.setFechaCierre(LocalDateTime.now());
-
         solicitudRepository.save(solicitud);
+    }
+
+    @Override
+    public Solicitud obtenerPorId(Long id) {
+        return solicitudRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada con ID: " + id));
+    }
+
+    @Override
+    public List<Solicitud> listarPorEstado(EstadoSolicitud estado) {
+        return solicitudRepository.findByEstado(estado);
+    }
+
+    @Override
+    public List<Historial> obtenerHistorial(Long idSolicitud) {
+        return historialRepository.findBySolicitudIdOrderByFechaHoraDesc(idSolicitud);
+    }
+
+    @Override
+    public List<Solicitud> listarPorEstudiante(Long estudianteId) {
+        return solicitudRepository.findByEstudianteId(estudianteId);
     }
 }

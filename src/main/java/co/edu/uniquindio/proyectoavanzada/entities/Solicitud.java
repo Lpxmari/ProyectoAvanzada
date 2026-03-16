@@ -34,9 +34,9 @@ public class Solicitud {
     @JoinColumn(name = "estudiante_id")
     private Estudiante estudiante;
 
-    //@ManyToOne
-    //@JoinColumn(name = "responsable_id")
-    //private Responsable responsableAsignado;
+    @ManyToOne
+    @JoinColumn(name = "responsable_id")
+    private Responsable responsableAsignado;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "prioridad_id")

@@ -8,6 +8,9 @@ import java.util.List;
 
 @Repository
 public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
-    // Spring crea automáticamente la consulta para buscar por estado
+
+    // Este es el método nuevo para el estudiante
+    List<Solicitud> findByEstudianteId(Long estudianteId);
+
     List<Solicitud> findByEstado(EstadoSolicitud estado);
 }

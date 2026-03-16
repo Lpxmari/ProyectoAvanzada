@@ -6,10 +6,11 @@ import lombok.*;
 
 @Entity
 @Table(name = "estudiantes")
-@Data // Genera Getters, Setters, toString, equals y hashCode
-@NoArgsConstructor // Constructor vacío (obligatorio para JPA)
-@AllArgsConstructor // Constructor con todos los campos
-@Builder // Permite crear objetos de forma fluida: Estudiante.builder().nombre("...").build()
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
 public class Estudiante {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

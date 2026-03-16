@@ -1,12 +1,12 @@
 package co.edu.uniquindio.proyectoavanzada.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginResponse {
     private String token;
+    private String nombre;
+    private String rol;
 }
