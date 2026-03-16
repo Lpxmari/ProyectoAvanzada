@@ -17,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor // Lombok crea el constructor para inyectar los repositorios
+
 public class SolicitudServiceImpl implements SolicitudService {
 
 
@@ -77,8 +78,23 @@ public class SolicitudServiceImpl implements SolicitudService {
     // 4. Asignar Responsable
     @Override
     public Solicitud asignarResponsable(Long idSolicitud, Long idResponsable) {
-        Solicitud solicitud = solicitudRepository.findById(idSolicitud).orElseThrow();
-        Responsable responsable = responsableRepository.findById(idResponsable).orElseThrow();
+        Solicitud solicitud = solicitudRepository.findById(idSolicitud)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada"));
+
+        Responsable responsable = responsableRepository.findById(idResponsable)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Responsable no encontrado"));
+
+        // Guardar quién hizo el cambio en el historial
+        Historial h = Historial.builder()
+                .fechaHora(LocalDateTime.now())
+                .estadoAnterior(solicitud.getEstado())
+                .estadoNuevo(EstadoSolicitud.EN_ATENCION)
+                .observaciones("Responsable asignado: " + responsable.getNombreCompleto())
+                .solicitud(solicitud)
+                .responsableAccion(responsable) // Quién toma el caso
+                .build();
+
+        historialRepository.save(h);
 
         //solicitud.setResponsableAsignado(responsable);
         solicitud.setEstado(EstadoSolicitud.EN_ATENCION);
@@ -88,6 +104,12 @@ public class SolicitudServiceImpl implements SolicitudService {
 
     @Override
     public void cerrarSolicitud(Long id) {
+        Solicitud solicitud = solicitudRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se puede cerrar: solicitud inexistente"));
 
+        solicitud.setEstado(EstadoSolicitud.CERRADA);
+        solicitud.setFechaCierre(LocalDateTime.now());
+
+        solicitudRepository.save(solicitud);
     }
 }
