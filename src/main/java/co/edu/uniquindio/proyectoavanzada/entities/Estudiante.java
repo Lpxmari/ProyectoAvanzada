@@ -16,6 +16,7 @@ public class Estudiante {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    //private String cedula;
     private String nombreCompleto;
     private String correo;
     private ProgramaAcademico programa;

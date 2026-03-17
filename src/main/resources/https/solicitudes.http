@@ -1,0 +1,12 @@
+### POST request to example server
+POST http://localhost:8080/api/solicitudes
+Content-Type: application/json
+
+{
+    "descripcion": "Hice un curso de ingles en el exterior y quiero homologar las materias",
+    "tipoSolicitud": "HOMOLOGACION",
+    "canalOrigen": "CSU",
+    "estudianteId": 1
+}
+
+###

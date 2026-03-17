@@ -1,6 +1,9 @@
 package co.edu.uniquindio.proyectoavanzada.services;
 
 import co.edu.uniquindio.proyectoavanzada.dto.CrearSolicitudDTO;
+import co.edu.uniquindio.proyectoavanzada.dto.HistorialDTO;
+import co.edu.uniquindio.proyectoavanzada.dto.PrioridadDTO;
+import co.edu.uniquindio.proyectoavanzada.dto.SolicitudDTO;
 import co.edu.uniquindio.proyectoavanzada.entities.*;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.EstadoSolicitud;
 
@@ -10,19 +13,19 @@ public interface SolicitudService {
 
     Solicitud registrarSolicitud(CrearSolicitudDTO solicitud);
 
-    List<Solicitud> listarTodas();
+    List<SolicitudDTO> listarTodas();
 
-    Solicitud realizarTriage(Long id, Prioridad prioridad);
+    Solicitud realizarTriage(Long id, PrioridadDTO prioridad);
 
     Solicitud asignarResponsable(Long idSolicitud, Long idResponsable);
 
     void cerrarSolicitud(Long id);
 
-    Solicitud obtenerPorId(Long id);
+    SolicitudDTO obtenerPorId(Long id);
 
-    List<Solicitud> listarPorEstado(EstadoSolicitud estado);
+    List<SolicitudDTO> listarPorEstado(EstadoSolicitud estado);
 
-    List<Historial> obtenerHistorial(Long idSolicitud);
+    List<HistorialDTO> obtenerHistorial(Long idSolicitud);
 
-    List<Solicitud> listarPorEstudiante(Long estudianteId);
+    List<SolicitudDTO> listarPorEstudiante(Long estudianteId);
 }

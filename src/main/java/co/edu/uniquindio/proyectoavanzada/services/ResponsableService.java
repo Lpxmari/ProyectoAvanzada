@@ -6,19 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class ResponsableService {
+public interface ResponsableService {
 
-    private final ResponsableRepository responsableRepository;
+    List<Responsable> listarActivos();
 
-    public List<Responsable> listarActivos() {
-        return responsableRepository.findAll().stream()
-                .filter(Responsable::isActivo)
-                .toList();
-    }
-
-    public Responsable crearResponsable(Responsable responsable) {
-        return responsableRepository.save(responsable);
-    }
+    Responsable crearResponsable(Responsable responsable);
 }

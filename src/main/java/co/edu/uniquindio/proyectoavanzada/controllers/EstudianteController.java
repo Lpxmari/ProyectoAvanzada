@@ -2,6 +2,7 @@ package co.edu.uniquindio.proyectoavanzada.controllers;
 
 import co.edu.uniquindio.proyectoavanzada.dto.EstudianteDTO;
 import co.edu.uniquindio.proyectoavanzada.services.EstudianteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class EstudianteController {
     private final EstudianteService estudianteService;
 
     @PostMapping
-    public ResponseEntity<String> crear(@RequestBody EstudianteDTO dto) {
+    public ResponseEntity<String> crear(@Valid @RequestBody EstudianteDTO dto) {
         estudianteService.crearEstudiante(dto);
         return ResponseEntity.ok("Estudiante creado con éxito");
     }

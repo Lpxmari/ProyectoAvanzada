@@ -23,9 +23,9 @@ public class EstudianteServiceImpl implements EstudianteService {
     @Override
     public Long crearEstudiante(EstudianteDTO dto) {
         Estudiante nuevo = Estudiante.builder()
-                .nombreCompleto(dto.getNombreCompleto())
-                .correo(dto.getCorreo())
-                .programa(ProgramaAcademico.valueOf(dto.getPrograma()))
+                .nombreCompleto(dto.nombreCompleto())
+                .correo(dto.correo())
+                .programa(dto.programa())
                 .build();
         return estudianteRepository.save(nuevo).getId();
     }
@@ -35,9 +35,9 @@ public class EstudianteServiceImpl implements EstudianteService {
         Estudiante estudiante = estudianteRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estudiante no encontrado"));
 
-        estudiante.setNombreCompleto(dto.getNombreCompleto());
-        estudiante.setCorreo(dto.getCorreo());
-        estudiante.setPrograma(ProgramaAcademico.valueOf(dto.getPrograma()));
+        estudiante.setNombreCompleto(dto.nombreCompleto());
+        estudiante.setCorreo(dto.correo());
+        estudiante.setPrograma(dto.programa());
 
         estudianteRepository.save(estudiante);
     }
@@ -56,14 +56,14 @@ public class EstudianteServiceImpl implements EstudianteService {
         Estudiante e = estudianteRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estudiante no encontrado"));
 
-        return new EstudianteDTO(e.getId(), e.getNombreCompleto(), e.getCorreo(), e.getPrograma().name());
+        return new EstudianteDTO(e.getId(), e.getNombreCompleto(), e.getCorreo(), e.getPrograma());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<EstudianteDTO> listarEstudiantes() {
         return estudianteRepository.findAll().stream()
-                .map(e -> new EstudianteDTO(e.getId(), e.getNombreCompleto(), e.getCorreo(), e.getPrograma().name()))
+                .map(e -> new EstudianteDTO(e.getId(), e.getNombreCompleto(), e.getCorreo(), e.getPrograma()))
                 .collect(Collectors.toList());
     }
 }

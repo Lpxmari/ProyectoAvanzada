@@ -1,14 +1,12 @@
 package co.edu.uniquindio.proyectoavanzada.dto;
 
-import lombok.*;
+import co.edu.uniquindio.proyectoavanzada.entities.enums.NivelSolicitud;
+
 import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class PrioridadDTO {
-    private String nivel; // ALTA, MEDIA, BAJA
-    private String impactoAcademico;
-    private String justificacion;
-    private LocalDate vigencia;
-}
+public record PrioridadDTO(
+        NivelSolicitud nivel,
+        String impactoAcademico,
+        String justificacion,
+        LocalDate vigencia
+) {}

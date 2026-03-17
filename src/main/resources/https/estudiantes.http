@@ -1,0 +1,14 @@
+### GET request to example server
+GET http://localhost:8080/api/estudiantes
+
+###
+
+
+POST http://localhost:8080/api/estudiantes
+Content-Type: application/json
+
+{
+    "nombreCompleto": "Juan Perez",
+    "correo": "aaaaa@aaa.com",
+    "programa": "ING_SISTEMAS"
+}

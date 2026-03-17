@@ -1,6 +1,6 @@
 package co.edu.uniquindio.proyectoavanzada.services.impl;
 
-import co.edu.uniquindio.proyectoavanzada.dto.CrearSolicitudDTO;
+import co.edu.uniquindio.proyectoavanzada.dto.*;
 import co.edu.uniquindio.proyectoavanzada.entities.*;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.EstadoSolicitud;
 import co.edu.uniquindio.proyectoavanzada.excepciones.RecursoNoEncontradoException;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor // Lombok crea el constructor para inyectar los repositorios
@@ -31,13 +32,13 @@ public class SolicitudServiceImpl implements SolicitudService {
     @Override
     public Solicitud registrarSolicitud(CrearSolicitudDTO solicitud) {
 
-        Estudiante estudiante = estudianteRepository.findById(solicitud.getEstudianteId())
+        Estudiante estudiante = estudianteRepository.findById(solicitud.estudianteId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Estudiante no encontrado"));
 
         Solicitud nueva = Solicitud.builder()
-                .descripcion(solicitud.getDescripcion())
-                .tipo(solicitud.getTipoSolicitud())
-                .canalOrigen(solicitud.getCanalOrigen())
+                .descripcion(solicitud.descripcion())
+                .tipo(solicitud.tipoSolicitud())
+                .canalOrigen(solicitud.canalOrigen())
                 .estudiante(estudiante)
                 .fechaHoraRegistro(LocalDateTime.now())
                 .estado(EstadoSolicitud.REGISTRADA)
@@ -48,15 +49,25 @@ public class SolicitudServiceImpl implements SolicitudService {
 
     // 2. Listar solicitudes (Responsable)
     @Override
-    public List<Solicitud> listarTodas() {
-        return solicitudRepository.findAll();
+    public List<SolicitudDTO> listarTodas() {
+        return solicitudRepository.findAll().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
     }
 
     // 3. Proceso de Triage (Asignar Prioridad)
     @Override
-    public Solicitud realizarTriage(Long id, Prioridad prioridad) {
+    public Solicitud realizarTriage(Long id, PrioridadDTO prioridadDTO) {
         Solicitud solicitud = solicitudRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
+
+        // Convertimos el String del DTO al Enum que pide la Entidad
+        Prioridad prioridad = Prioridad.builder()
+                .nivel(prioridadDTO.nivel()) // <--- Usa .valueOf() aquí
+                .impactoAcademico(prioridadDTO.impactoAcademico())
+                .justificacion(prioridadDTO.justificacion())
+                .vigencia(prioridadDTO.vigencia())
+                .build();
 
         // Guardamos el historial del cambio
         Historial h = Historial.builder()
@@ -106,30 +117,82 @@ public class SolicitudServiceImpl implements SolicitudService {
     @Override
     @Transactional
     public void cerrarSolicitud(Long id) {
-        Solicitud solicitud = obtenerPorId(id);
+        Solicitud solicitud = findById(id);
         solicitud.setEstado(EstadoSolicitud.CERRADA);
         solicitud.setFechaCierre(LocalDateTime.now());
         solicitudRepository.save(solicitud);
     }
 
     @Override
-    public Solicitud obtenerPorId(Long id) {
-        return solicitudRepository.findById(id)
+    public SolicitudDTO obtenerPorId(Long id) {
+        Solicitud solicitud =  solicitudRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada con ID: " + id));
+        return convertirADTO(solicitud);
+    }
+
+    @Override
+    public List<SolicitudDTO> listarPorEstado(EstadoSolicitud estado) {
+        return solicitudRepository.findByEstado(estado).stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<HistorialDTO> obtenerHistorial(Long idSolicitud) {
+        return historialRepository.findBySolicitudIdOrderByFechaHoraDesc(idSolicitud).stream()
+                .map(h -> new HistorialDTO(
+                        h.getId(),
+                        h.getFechaHora(),
+                        h.getEstadoAnterior(),
+                        h.getEstadoNuevo(),
+                        h.getObservaciones(),
+                        h.getResponsableAccion() != null ? new ResponsableDTO(
+                                h.getResponsableAccion().getId(),
+                                h.getResponsableAccion().getNombreCompleto(),
+                                h.getResponsableAccion().getCargo(),
+                                h.getResponsableAccion().isActivo()
+                        ) : null
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SolicitudDTO> listarPorEstudiante(Long estudianteId) {
+        return solicitudRepository.findByEstudianteId(estudianteId).stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    private Solicitud findById(Long id) {
+        return  solicitudRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada con ID: " + id));
     }
 
-    @Override
-    public List<Solicitud> listarPorEstado(EstadoSolicitud estado) {
-        return solicitudRepository.findByEstado(estado);
-    }
-
-    @Override
-    public List<Historial> obtenerHistorial(Long idSolicitud) {
-        return historialRepository.findBySolicitudIdOrderByFechaHoraDesc(idSolicitud);
-    }
-
-    @Override
-    public List<Solicitud> listarPorEstudiante(Long estudianteId) {
-        return solicitudRepository.findByEstudianteId(estudianteId);
+    // --- MÉTODO AUXILIAR DE CONVERSIÓN ---
+    private SolicitudDTO convertirADTO(Solicitud s) {
+        return new SolicitudDTO(
+                s.getId(),
+                s.getDescripcion(),
+                s.getFechaHoraRegistro(),
+                s.getFechaCierre(),
+                s.getEstado(),
+                s.getTipo(),
+                new EstudianteDTO(
+                        s.getEstudiante().getId(),
+                        s.getEstudiante().getNombreCompleto(),
+                        s.getEstudiante().getCorreo(),
+                        s.getEstudiante().getPrograma()),
+                // Si hay responsable, lo mapeamos, si no, va null
+                s.getResponsableAsignado() != null ? new ResponsableDTO(
+                        s.getResponsableAsignado().getId(),
+                        s.getResponsableAsignado().getNombreCompleto(),
+                        s.getResponsableAsignado().getCargo(),
+                        s.getResponsableAsignado().isActivo()) : null,
+                s.getPrioridad() != null ? new PrioridadDTO(
+                        s.getPrioridad().getNivel(),
+                        s.getPrioridad().getImpactoAcademico(),
+                        s.getPrioridad().getJustificacion(),
+                        s.getPrioridad().getVigencia()) : null
+        );
     }
 }
