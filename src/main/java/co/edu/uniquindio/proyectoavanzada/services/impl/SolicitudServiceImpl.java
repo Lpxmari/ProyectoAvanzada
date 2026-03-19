@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor // Lombok crea el constructor para inyectar los repositorios
+@RequiredArgsConstructor 
 
 public class SolicitudServiceImpl implements SolicitudService {
 
@@ -63,7 +63,7 @@ public class SolicitudServiceImpl implements SolicitudService {
 
         // Convertimos el String del DTO al Enum que pide la Entidad
         Prioridad prioridad = Prioridad.builder()
-                .nivel(prioridadDTO.nivel()) // <--- Usa .valueOf() aquí
+                .nivel(prioridadDTO.nivel())
                 .impactoAcademico(prioridadDTO.impactoAcademico())
                 .justificacion(prioridadDTO.justificacion())
                 .vigencia(prioridadDTO.vigencia())
