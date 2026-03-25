@@ -96,14 +96,28 @@ public class SolicitudServiceImpl implements SolicitudService {
         Responsable responsable = responsableRepository.findById(idResponsable)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Responsable no encontrado"));
 
-        // Guardar quién hizo el cambio en el historial
+        // Validar que la solicitud esté en estado correcto
+        if (solicitud.getEstado() != EstadoSolicitud.CLASIFICADA) {
+            throw new IllegalStateException(
+                    "Solo se puede asignar responsable a solicitudes en estado CLASIFICADA. " +
+                            "Estado actual: " + solicitud.getEstado()
+            );
+        }
+
+        // Validar que el responsable esté activo
+        if (!responsable.isActivo()) {
+            throw new IllegalStateException(
+                    "No se puede asignar un responsable inactivo"
+            );
+        }
+
         Historial h = Historial.builder()
                 .fechaHora(LocalDateTime.now())
                 .estadoAnterior(solicitud.getEstado())
                 .estadoNuevo(EstadoSolicitud.EN_ATENCION)
                 .observaciones("Responsable asignado: " + responsable.getNombreCompleto())
                 .solicitud(solicitud)
-                .responsableAccion(responsable) // Quién toma el caso
+                .responsableAccion(responsable)
                 .build();
 
         historialRepository.save(h);
@@ -118,6 +132,26 @@ public class SolicitudServiceImpl implements SolicitudService {
     @Transactional
     public void cerrarSolicitud(Long id) {
         Solicitud solicitud = findById(id);
+
+        // RF-08: solo se puede cerrar si está ATENDIDA
+        if (solicitud.getEstado() != EstadoSolicitud.ATENDIDA) {
+            throw new IllegalStateException(
+                    "La solicitud debe estar en estado ATENDIDA para poder cerrarse. " +
+                            "Estado actual: " + solicitud.getEstado()
+            );
+        }
+
+        // Registrar en el historial el cierre
+        Historial h = Historial.builder()
+                .fechaHora(LocalDateTime.now())
+                .estadoAnterior(EstadoSolicitud.ATENDIDA)
+                .estadoNuevo(EstadoSolicitud.CERRADA)
+                .observaciones("Solicitud cerrada formalmente")
+                .solicitud(solicitud)
+                .build();
+
+        historialRepository.save(h);
+
         solicitud.setEstado(EstadoSolicitud.CERRADA);
         solicitud.setFechaCierre(LocalDateTime.now());
         solicitudRepository.save(solicitud);

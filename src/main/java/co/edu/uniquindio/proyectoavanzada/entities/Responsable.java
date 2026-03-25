@@ -3,6 +3,8 @@ package co.edu.uniquindio.proyectoavanzada.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "responsables")
 @Data
@@ -17,4 +19,7 @@ public class Responsable {
     private String nombreCompleto;
     private String cargo;
     private boolean activo;
+
+    private boolean isDeleted;
+    private LocalDateTime deletedAt;
 }

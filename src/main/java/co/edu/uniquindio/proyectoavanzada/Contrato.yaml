@@ -103,6 +103,26 @@ paths:
         '200':
           description: Responsable asignado correctamente.
 
+  /solicitudes/{id}/cerrar:
+    put:
+      summary: Cerrar una solicitud atendida
+      operationId: cerrarSolicitud
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Solicitud cerrada exitosamente.
+        '400':
+          description: La solicitud no está en estado ATENDIDA.
+        '404':
+          description: Solicitud no encontrada.
+
   /solicitudes/{id}/historial:
     get:
       summary: Ver historial de cambios de la solicitud

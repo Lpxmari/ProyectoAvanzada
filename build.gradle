@@ -30,7 +30,8 @@ dependencies {
     // Para la persistencia de datos y mapeo objeto-relacional (ORM)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // Base de datos en memoria para pruebas
-    runtimeOnly 'com.h2database:h2'
+    //runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     // Lombok (Opcional) para generar Getters, Setters y Constructores
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
