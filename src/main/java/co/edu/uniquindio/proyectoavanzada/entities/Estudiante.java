@@ -3,20 +3,16 @@ package co.edu.uniquindio.proyectoavanzada.entities;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.ProgramaAcademico;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "estudiantes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
+public class Estudiante extends Usuario {
 
-public class Estudiante {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    //private String cedula;
     private String nombreCompleto;
     private String correo;
     private ProgramaAcademico programa;

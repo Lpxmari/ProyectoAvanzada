@@ -2,6 +2,7 @@ package co.edu.uniquindio.proyectoavanzada.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -10,15 +11,11 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Responsable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@SuperBuilder
+public class Responsable extends Usuario {
 
     private String nombreCompleto;
     private String cargo;
-    private boolean activo;
 
     private boolean isDeleted;
     private LocalDateTime deletedAt;
