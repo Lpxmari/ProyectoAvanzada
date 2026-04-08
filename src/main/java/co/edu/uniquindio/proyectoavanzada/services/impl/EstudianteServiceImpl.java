@@ -1,5 +1,6 @@
 package co.edu.uniquindio.proyectoavanzada.services.impl;
 
+import co.edu.uniquindio.proyectoavanzada.dto.CrearEstudianteDTO;
 import co.edu.uniquindio.proyectoavanzada.dto.EstudianteDTO;
 import co.edu.uniquindio.proyectoavanzada.entities.Estudiante;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.ProgramaAcademico;
@@ -7,6 +8,7 @@ import co.edu.uniquindio.proyectoavanzada.excepciones.RecursoNoEncontradoExcepti
 import co.edu.uniquindio.proyectoavanzada.repositories.EstudianteRepository;
 import co.edu.uniquindio.proyectoavanzada.services.EstudianteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +21,14 @@ import java.util.stream.Collectors;
 public class EstudianteServiceImpl implements EstudianteService {
 
     private final EstudianteRepository estudianteRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Long crearEstudiante(EstudianteDTO dto) {
+    public Long crearEstudiante(CrearEstudianteDTO dto) {
         Estudiante nuevo = Estudiante.builder()
                 .nombreCompleto(dto.nombreCompleto())
                 .correo(dto.correo())
+                .password( passwordEncoder.encode(dto.password()) )
                 .programa(dto.programa())
                 .build();
         return estudianteRepository.save(nuevo).getId();

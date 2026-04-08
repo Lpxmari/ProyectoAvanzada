@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
                         "Usuario no encontrado: " + request.username()));
 
         // Verificamos que el usuario esté activo
-        if (!usuario.isActivo()) {
+        if (!Boolean.TRUE.equals(usuario.getActivo())) {
             throw new RuntimeException("Usuario inactivo");
         }
 
@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
         // Si todo está bien, generamos y retornamos el token JWT
         return jwtUtil.generarToken(
                 usuario.getUsername(),
-                usuario.getRol().name()
+                usuario.getRol()
         );
     }
 }

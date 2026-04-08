@@ -105,7 +105,7 @@ public class SolicitudServiceImpl implements SolicitudService {
         }
 
         // Validar que el responsable esté activo
-        if (!responsable.isActivo()) {
+        if (!Boolean.TRUE.equals(responsable.getActivo())) {
             throw new IllegalStateException(
                     "No se puede asignar un responsable inactivo"
             );
@@ -130,7 +130,7 @@ public class SolicitudServiceImpl implements SolicitudService {
 
     @Override
     @Transactional
-    public void cerrarSolicitud(Long id) {
+    public void cerrarSolicitud(Long id, CierreDTO cierreDTO) {
         Solicitud solicitud = findById(id);
 
         // RF-08: solo se puede cerrar si está ATENDIDA
@@ -141,12 +141,19 @@ public class SolicitudServiceImpl implements SolicitudService {
             );
         }
 
-        // Registrar en el historial el cierre
+        // RF-08: registrar observación de cierre obligatoria
+        if (cierreDTO.observacion() == null || cierreDTO.observacion().isBlank()) {
+            throw new IllegalStateException(
+                    "Debe registrar una observación para cerrar la solicitud"
+            );
+        }
+
+        // Registrar en el historial con la observación del cierre
         Historial h = Historial.builder()
                 .fechaHora(LocalDateTime.now())
                 .estadoAnterior(EstadoSolicitud.ATENDIDA)
                 .estadoNuevo(EstadoSolicitud.CERRADA)
-                .observaciones("Solicitud cerrada formalmente")
+                .observaciones(cierreDTO.observacion())
                 .solicitud(solicitud)
                 .build();
 
@@ -155,6 +162,37 @@ public class SolicitudServiceImpl implements SolicitudService {
         solicitud.setEstado(EstadoSolicitud.CERRADA);
         solicitud.setFechaCierre(LocalDateTime.now());
         solicitudRepository.save(solicitud);
+    }
+
+    @Override
+    @Transactional
+    public Solicitud marcarComoAtendida(Long id, String observaciones) {
+        Solicitud solicitud = solicitudRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Solicitud no encontrada con ID: " + id));
+
+        // Solo se puede atender si está EN_ATENCION
+        if (solicitud.getEstado() != EstadoSolicitud.EN_ATENCION) {
+            throw new IllegalStateException(
+                    "Solo se puede atender una solicitud en estado EN_ATENCION. " +
+                            "Estado actual: " + solicitud.getEstado()
+            );
+        }
+
+        // Registrar en historial
+        Historial h = Historial.builder()
+                .fechaHora(LocalDateTime.now())
+                .estadoAnterior(EstadoSolicitud.EN_ATENCION)
+                .estadoNuevo(EstadoSolicitud.ATENDIDA)
+                .observaciones(observaciones != null ? observaciones : "Solicitud atendida")
+                .solicitud(solicitud)
+                .responsableAccion(solicitud.getResponsableAsignado())
+                .build();
+
+        historialRepository.save(h);
+
+        solicitud.setEstado(EstadoSolicitud.ATENDIDA);
+        return solicitudRepository.save(solicitud);
     }
 
     @Override
@@ -184,7 +222,8 @@ public class SolicitudServiceImpl implements SolicitudService {
                                 h.getResponsableAccion().getId(),
                                 h.getResponsableAccion().getNombreCompleto(),
                                 h.getResponsableAccion().getCargo(),
-                                h.getResponsableAccion().isActivo()
+                                Boolean.TRUE.equals(h.getResponsableAccion().getActivo())
+
                         ) : null
                 ))
                 .collect(Collectors.toList());
@@ -221,7 +260,7 @@ public class SolicitudServiceImpl implements SolicitudService {
                         s.getResponsableAsignado().getId(),
                         s.getResponsableAsignado().getNombreCompleto(),
                         s.getResponsableAsignado().getCargo(),
-                        s.getResponsableAsignado().isActivo()) : null,
+                        Boolean.TRUE.equals(s.getResponsableAsignado().getActivo())) : null,
                 s.getPrioridad() != null ? new PrioridadDTO(
                         s.getPrioridad().getNivel(),
                         s.getPrioridad().getImpactoAcademico(),

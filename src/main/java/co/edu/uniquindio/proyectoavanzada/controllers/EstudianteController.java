@@ -1,5 +1,6 @@
 package co.edu.uniquindio.proyectoavanzada.controllers;
 
+import co.edu.uniquindio.proyectoavanzada.dto.CrearEstudianteDTO;
 import co.edu.uniquindio.proyectoavanzada.dto.EstudianteDTO;
 import co.edu.uniquindio.proyectoavanzada.services.EstudianteService;
 import jakarta.validation.Valid;
@@ -18,7 +19,7 @@ public class EstudianteController {
     private final EstudianteService estudianteService;
 
     @PostMapping
-    public ResponseEntity<String> crear(@Valid @RequestBody EstudianteDTO dto) {
+    public ResponseEntity<String> crear(@Valid @RequestBody CrearEstudianteDTO dto) {
         estudianteService.crearEstudiante(dto);
         return ResponseEntity.ok("Estudiante creado con éxito");
     }

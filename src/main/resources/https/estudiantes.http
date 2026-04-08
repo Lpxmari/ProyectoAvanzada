@@ -10,5 +10,6 @@ Content-Type: application/json
 {
     "nombreCompleto": "Juan Perez",
     "correo": "aaaaa@aaa.com",
+    "password": "123",
     "programa": "ING_SISTEMAS"
 }

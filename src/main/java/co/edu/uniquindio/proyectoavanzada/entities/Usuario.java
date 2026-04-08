@@ -24,8 +24,23 @@ public class Usuario {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private RolUsuario rol;
+    //@Enumerated(EnumType.STRING)
+    //private RolUsuario rol;
 
-    private boolean activo;
+    private Boolean activo;
+
+    public String getRol(){
+        var rol = "";
+
+        if(this instanceof Responsable){
+            rol = "ROLE_RESPONSABLE";
+        }else if(this instanceof Estudiante){
+            rol = "ROLE_ESTUDIANTE";
+        }else{
+            rol = "ROLE_ADMIN";
+        }
+
+        return rol;
+    }
+
 }

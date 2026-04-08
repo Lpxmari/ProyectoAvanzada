@@ -7,6 +7,7 @@ import co.edu.uniquindio.proyectoavanzada.entities.enums.TipoSolicitud;
 import co.edu.uniquindio.proyectoavanzada.excepciones.RecursoNoEncontradoException;
 import co.edu.uniquindio.proyectoavanzada.repositories.*;
 import co.edu.uniquindio.proyectoavanzada.services.impl.SolicitudServiceImpl;
+import co.edu.uniquindio.proyectoavanzada.dto.CierreDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -88,11 +89,13 @@ class SolicitudServiceTest {
                 .estado(EstadoSolicitud.ATENDIDA)
                 .build();
 
+        CierreDTO cierreDTO = new CierreDTO(null, "Solicitud resuelta satisfactoriamente", null);
+
         when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
         when(solicitudRepository.save(any())).thenReturn(solicitud);
         when(historialRepository.save(any())).thenReturn(null);
 
-        solicitudService.cerrarSolicitud(1L);
+        solicitudService.cerrarSolicitud(1L, cierreDTO);
 
         assertEquals(EstadoSolicitud.CERRADA, solicitud.getEstado());
         assertNotNull(solicitud.getFechaCierre());
@@ -105,10 +108,12 @@ class SolicitudServiceTest {
                 .estado(EstadoSolicitud.REGISTRADA)
                 .build();
 
+        CierreDTO cierreDTO = new CierreDTO(null, "observacion", null);
+
         when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
 
         assertThrows(IllegalStateException.class, () -> {
-            solicitudService.cerrarSolicitud(1L);
+            solicitudService.cerrarSolicitud(1L, cierreDTO);
         });
     }
 
@@ -127,6 +132,36 @@ class SolicitudServiceTest {
 
         assertThrows(IllegalStateException.class, () -> {
             solicitudService.asignarResponsable(1L, 1L);
+        });
+    }
+
+    // PRUEBA 6: Marcar solicitud como atendida exitosamente
+    @Test
+    void marcarComoAtendida_exitoso() {
+        Solicitud solicitud = Solicitud.builder()
+                .estado(EstadoSolicitud.EN_ATENCION)
+                .build();
+
+        when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+        when(solicitudRepository.save(any())).thenReturn(solicitud);
+        when(historialRepository.save(any())).thenReturn(null);
+
+        solicitudService.marcarComoAtendida(1L, "Se atendió correctamente");
+
+        assertEquals(EstadoSolicitud.ATENDIDA, solicitud.getEstado());
+    }
+
+    // PRUEBA 7: Marcar como atendida una solicitud en estado incorrecto
+    @Test
+    void marcarComoAtendida_estadoInvalido_lanzaExcepcion() {
+        Solicitud solicitud = Solicitud.builder()
+                .estado(EstadoSolicitud.REGISTRADA)
+                .build();
+
+        when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+
+        assertThrows(IllegalStateException.class, () -> {
+            solicitudService.marcarComoAtendida(1L, "observacion");
         });
     }
 }

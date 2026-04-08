@@ -6,6 +6,7 @@ import co.edu.uniquindio.proyectoavanzada.dto.PrioridadDTO;
 import co.edu.uniquindio.proyectoavanzada.dto.SolicitudDTO;
 import co.edu.uniquindio.proyectoavanzada.entities.*;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.EstadoSolicitud;
+import co.edu.uniquindio.proyectoavanzada.dto.CierreDTO;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface SolicitudService {
 
     Solicitud asignarResponsable(Long idSolicitud, Long idResponsable);
 
-    void cerrarSolicitud(Long id);
+    void cerrarSolicitud(Long id, CierreDTO cierreDTO);
 
     SolicitudDTO obtenerPorId(Long id);
 
@@ -28,4 +29,6 @@ public interface SolicitudService {
     List<HistorialDTO> obtenerHistorial(Long idSolicitud);
 
     List<SolicitudDTO> listarPorEstudiante(Long estudianteId);
+
+    Solicitud marcarComoAtendida(Long id, String observaciones);
 }

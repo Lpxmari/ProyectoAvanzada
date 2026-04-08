@@ -108,18 +108,49 @@ paths:
       summary: Cerrar una solicitud atendida
       operationId: cerrarSolicitud
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CierreDTO'
       responses:
         '200':
           description: Solicitud cerrada exitosamente.
         '400':
-          description: La solicitud no está en estado ATENDIDA.
+          description: La solicitud no está en estado ATENDIDA o falta observación.
+        '404':
+          description: Solicitud no encontrada.
+
+  /solicitudes/{id}/atender:
+    put:
+      summary: Marcar solicitud como atendida (Responsable)
+      operationId: marcarComoAtendida
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: observaciones
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Solicitud marcada como atendida correctamente.
+        '400':
+          description: La solicitud no está en estado EN_ATENCION.
         '404':
           description: Solicitud no encontrada.
 
@@ -167,6 +198,18 @@ components:
         tipoSolicitud: { $ref: '#/components/schemas/TipoSolicitudEnum' }
         canalOrigen: { type: string }
         estudianteId: { type: string }
+
+    CierreDTO:
+      type: object
+      required: [ observacion ]
+      properties:
+        responsableId:
+          type: integer
+        observacion:
+          type: string
+        fecha:
+          type: string
+          format: date-time
 
     SolicitudDTO:
       type: object

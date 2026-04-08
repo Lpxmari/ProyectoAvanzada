@@ -48,9 +48,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/solicitudes/*/responsable").hasRole("ADMIN")
                         .requestMatchers("/api/solicitudes/*/priorizar").hasRole("ADMIN")
                         .requestMatchers("/api/solicitudes/*/cerrar").hasRole("ADMIN")
+                        .requestMatchers("/api/solicitudes/estudiante/*").hasAnyRole("ESTUDIANTE","ADMIN") // Quien puede ver eso?
 
                         // RESPONSABLE y ADMIN pueden ver solicitudes e historial
                         .requestMatchers(HttpMethod.GET, "/api/solicitudes/**").hasAnyRole("RESPONSABLE", "ADMIN")
+
+                        // Solo RESPONSABLE o ADMIN pueden marcar como atendida
+                        .requestMatchers("/api/solicitudes/*/atender").hasAnyRole("RESPONSABLE", "ADMIN")
 
                         // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()

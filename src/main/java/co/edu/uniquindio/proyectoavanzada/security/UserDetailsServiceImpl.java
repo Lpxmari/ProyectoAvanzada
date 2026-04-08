@@ -1,5 +1,7 @@
 package co.edu.uniquindio.proyectoavanzada.security;
 
+import co.edu.uniquindio.proyectoavanzada.entities.Estudiante;
+import co.edu.uniquindio.proyectoavanzada.entities.Responsable;
 import co.edu.uniquindio.proyectoavanzada.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,8 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return User.builder()
                 .username(usuario.getUsername())
                 .password(usuario.getPassword())
-                .authorities(new SimpleGrantedAuthority(
-                        "ROLE_" + usuario.getRol().name()))
+                .authorities(new SimpleGrantedAuthority(usuario.getRol()))
                 .build();
     }
 }

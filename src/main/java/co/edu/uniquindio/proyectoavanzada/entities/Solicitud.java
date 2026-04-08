@@ -17,7 +17,6 @@ public class Solicitud {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String descripcion;
     private LocalDateTime fechaHoraRegistro;
     private LocalDateTime fechaCierre;

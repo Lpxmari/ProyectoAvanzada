@@ -6,6 +6,7 @@ import co.edu.uniquindio.proyectoavanzada.excepciones.RecursoNoEncontradoExcepti
 import co.edu.uniquindio.proyectoavanzada.repositories.ResponsableRepository;
 import co.edu.uniquindio.proyectoavanzada.services.ResponsableService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,18 +17,20 @@ import java.util.List;
 public class ResponsableServiceImpl implements ResponsableService {
 
     private final ResponsableRepository responsableRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<ResponsableDTO> listarActivos() {
         return responsableRepository.findAll().stream()
                 .filter(r -> !r.isDeleted())
-                .filter(Responsable::isActivo)
+                .filter(r -> Boolean.TRUE.equals(r.getActivo()))
                 .map(this::convertirADTO)
                 .toList();
     }
 
     @Override
     public ResponsableDTO crearResponsable(Responsable responsable) {
+        responsable.setPassword( passwordEncoder.encode(responsable.getPassword()) );
         Responsable guardado = responsableRepository.save(responsable);
         return convertirADTO(guardado);
     }
@@ -53,7 +56,7 @@ public class ResponsableServiceImpl implements ResponsableService {
 
         existente.setNombreCompleto(datos.getNombreCompleto());
         existente.setCargo(datos.getCargo());
-        existente.setActivo(datos.isActivo());
+        existente.setActivo(datos.getActivo());
 
         return convertirADTO(responsableRepository.save(existente));
     }
@@ -77,7 +80,7 @@ public class ResponsableServiceImpl implements ResponsableService {
                 r.getId(),
                 r.getNombreCompleto(),
                 r.getCargo(),
-                r.isActivo()
+                Boolean.TRUE.equals(r.getActivo())
         );
     }
 }

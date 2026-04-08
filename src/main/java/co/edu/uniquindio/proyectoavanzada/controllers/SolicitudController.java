@@ -57,8 +57,10 @@ public class SolicitudController {
 
     // 8. Cerrar Solicitud
     @PutMapping("/{id}/cerrar")
-    public ResponseEntity<String> cerrarSolicitud(@PathVariable Long id) {
-        solicitudService.cerrarSolicitud(id);
+    public ResponseEntity<String> cerrarSolicitud(
+            @PathVariable Long id,
+            @RequestBody CierreDTO cierreDTO) {
+        solicitudService.cerrarSolicitud(id, cierreDTO);
         return ResponseEntity.ok("La solicitud ha sido cerrada exitosamente.");
     }
 
@@ -72,7 +74,17 @@ public class SolicitudController {
     // 10. Consultar las solicitudes de un estudiante específico
     @GetMapping("/estudiante/{idEstudiante}")
     public ResponseEntity<List<SolicitudDTO>> listarPorEstudiante(@PathVariable Long idEstudiante) {
+
         List<SolicitudDTO> respuesta = solicitudService.listarPorEstudiante(idEstudiante);
         return ResponseEntity.ok(respuesta);
+    }
+
+    // 11 Marcar solicitud como atendida (Responsable)
+    @PutMapping("/{id}/atender")
+    public ResponseEntity<String> atender(
+            @PathVariable Long id,
+            @RequestParam(required = false) String observaciones) {
+        solicitudService.marcarComoAtendida(id, observaciones);
+        return ResponseEntity.ok("Solicitud marcada como atendida correctamente");
     }
 }
