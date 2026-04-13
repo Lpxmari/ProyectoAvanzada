@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CrearEstudianteDTO(
-        Long id,
         @NotBlank String nombreCompleto,
         @Email(message = "El correo debe tener una forma válida")
         @NotBlank(message = "El correo es obligatorio") String correo,
-        String password,
+        @NotBlank String username,
+        @NotBlank String password,
         @NotNull ProgramaAcademico programa
 ) {}

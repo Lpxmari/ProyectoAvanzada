@@ -31,4 +31,6 @@ public interface SolicitudService {
     List<SolicitudDTO> listarPorEstudiante(Long estudianteId);
 
     Solicitud marcarComoAtendida(Long id, String observaciones);
+
+    List<SolicitudDTO> listarPorResponsable(Long responsableId);
 }

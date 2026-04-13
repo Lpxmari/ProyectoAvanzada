@@ -44,17 +44,20 @@ public class SecurityConfig {
                         // ESTUDIANTE solo puede registrar solicitudes (POST)
                         .requestMatchers(HttpMethod.POST, "/api/solicitudes").hasAnyRole("ESTUDIANTE", "ADMIN")
 
-                        // Solo ADMIN puede asignar responsable, priorizar y cerrar
+                        // Rutas específicas primero — antes del GET general
                         .requestMatchers("/api/solicitudes/*/responsable").hasRole("ADMIN")
                         .requestMatchers("/api/solicitudes/*/priorizar").hasRole("ADMIN")
-                        .requestMatchers("/api/solicitudes/*/cerrar").hasRole("ADMIN")
-                        .requestMatchers("/api/solicitudes/estudiante/*").hasAnyRole("ESTUDIANTE","ADMIN") // Quien puede ver eso?
-
-                        // RESPONSABLE y ADMIN pueden ver solicitudes e historial
-                        .requestMatchers(HttpMethod.GET, "/api/solicitudes/**").hasAnyRole("RESPONSABLE", "ADMIN")
-
-                        // Solo RESPONSABLE o ADMIN pueden marcar como atendida
+                        .requestMatchers("/api/solicitudes/*/cerrar").hasAnyRole("RESPONSABLE", "ADMIN")
                         .requestMatchers("/api/solicitudes/*/atender").hasAnyRole("RESPONSABLE", "ADMIN")
+
+                        // El estudiante ve sus propias solicitudes
+                        .requestMatchers("/api/solicitudes/estudiante/*").hasAnyRole("ESTUDIANTE", "ADMIN")
+
+                        // El responsable ve sus solicitudes asignadas
+                        .requestMatchers("/api/solicitudes/responsable/*").hasAnyRole("RESPONSABLE", "ADMIN")
+
+                        // RESPONSABLE y ADMIN pueden ver solicitudes e historial (GET general al final)
+                        .requestMatchers(HttpMethod.GET, "/api/solicitudes/**").hasAnyRole("RESPONSABLE", "ADMIN")
 
                         // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()

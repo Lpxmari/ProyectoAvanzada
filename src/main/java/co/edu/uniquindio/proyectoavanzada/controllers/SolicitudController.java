@@ -6,6 +6,8 @@ import co.edu.uniquindio.proyectoavanzada.entities.enums.EstadoSolicitud;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.NivelSolicitud;
 import co.edu.uniquindio.proyectoavanzada.services.SolicitudService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import co.edu.uniquindio.proyectoavanzada.repositories.EstudianteRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class SolicitudController {
 
     private final SolicitudService solicitudService;
+    private final EstudianteRepository estudianteRepository;
 
     // 1. Registrar (Mantenemos tu CrearSolicitudDTO)
     @PostMapping
@@ -55,6 +58,23 @@ public class SolicitudController {
         return ResponseEntity.ok("Prioridad y Triage asignados correctamente");
     }
 
+    // 6. Asignar responsable a una solicitud (ADMIN)
+    @PutMapping("/{id}/responsable")
+    public ResponseEntity<String> asignarResponsable(
+            @PathVariable Long id,
+            @RequestParam Long responsableId) {
+        solicitudService.asignarResponsable(id, responsableId);
+        return ResponseEntity.ok("Responsable asignado correctamente");
+    }
+
+    // 7. Consultar solicitudes asignadas a un responsable específico
+    @GetMapping("/responsable/{idResponsable}")
+    public ResponseEntity<List<SolicitudDTO>> listarPorResponsable(
+            @PathVariable Long idResponsable) {
+        List<SolicitudDTO> respuesta = solicitudService.listarPorResponsable(idResponsable);
+        return ResponseEntity.ok(respuesta);
+    }
+
     // 8. Cerrar Solicitud
     @PutMapping("/{id}/cerrar")
     public ResponseEntity<String> cerrarSolicitud(
@@ -73,10 +93,32 @@ public class SolicitudController {
 
     // 10. Consultar las solicitudes de un estudiante específico
     @GetMapping("/estudiante/{idEstudiante}")
-    public ResponseEntity<List<SolicitudDTO>> listarPorEstudiante(@PathVariable Long idEstudiante) {
+    public ResponseEntity<?> listarPorEstudiante(
+            @PathVariable Long idEstudiante,
+            Authentication authentication) {
 
-        List<SolicitudDTO> respuesta = solicitudService.listarPorEstudiante(idEstudiante);
-        return ResponseEntity.ok(respuesta);
+        // Obtenemos el username del token JWT
+        String usernameAutenticado = authentication.getName();
+
+        // Si es ADMIN puede ver cualquier estudiante
+        boolean esAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!esAdmin) {
+            // Buscamos el estudiante autenticado por username
+            Estudiante estudianteAutenticado = estudianteRepository
+                    .findByUsername(usernameAutenticado)
+                    .orElse(null);
+
+            // Solo puede ver sus propias solicitudes
+            if (estudianteAutenticado == null ||
+                    !estudianteAutenticado.getId().equals(idEstudiante)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("No tienes permiso para ver estas solicitudes");
+            }
+        }
+
+        return ResponseEntity.ok(solicitudService.listarPorEstudiante(idEstudiante));
     }
 
     // 11 Marcar solicitud como atendida (Responsable)

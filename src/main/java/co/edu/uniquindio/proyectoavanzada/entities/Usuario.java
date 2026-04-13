@@ -27,6 +27,7 @@ public class Usuario {
     //@Enumerated(EnumType.STRING)
     //private RolUsuario rol;
 
+    @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
     private Boolean activo;
 
     public String getRol(){

@@ -241,6 +241,13 @@ public class SolicitudServiceImpl implements SolicitudService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Solicitud no encontrada con ID: " + id));
     }
 
+    @Override
+    public List<SolicitudDTO> listarPorResponsable(Long responsableId) {
+        return solicitudRepository.findByResponsableAsignadoId(responsableId).stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
     // --- MÉTODO AUXILIAR DE CONVERSIÓN ---
     private SolicitudDTO convertirADTO(Solicitud s) {
         return new SolicitudDTO(

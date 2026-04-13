@@ -35,6 +35,7 @@ class SolicitudServiceTest {
     void registrarSolicitud_exitoso() {
         // Preparamos el estudiante simulado
         Estudiante estudiante = new Estudiante();
+        estudiante.setId(123L);
         estudiante.setNombreCompleto("Andrés Torres");
 
         // Preparamos el DTO de entrada
@@ -42,7 +43,7 @@ class SolicitudServiceTest {
                 "Necesito homologar una materia",
                 TipoSolicitud.HOMOLOGACION,
                 "correo",
-                1L
+                123L
         );
 
         // Preparamos la solicitud que retornará el repositorio
@@ -53,7 +54,7 @@ class SolicitudServiceTest {
                 .estudiante(estudiante)
                 .build();
 
-        when(estudianteRepository.findById(1L)).thenReturn(Optional.of(estudiante));
+        when(estudianteRepository.findById(123L)).thenReturn(Optional.of(estudiante));
         when(solicitudRepository.save(any(Solicitud.class))).thenReturn(solicitudGuardada);
 
         // Ejecutamos
@@ -86,16 +87,17 @@ class SolicitudServiceTest {
     @Test
     void cerrarSolicitud_exitoso() {
         Solicitud solicitud = Solicitud.builder()
+                .id(888L)
                 .estado(EstadoSolicitud.ATENDIDA)
                 .build();
 
         CierreDTO cierreDTO = new CierreDTO(null, "Solicitud resuelta satisfactoriamente", null);
 
-        when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+        when(solicitudRepository.findById(888L)).thenReturn(Optional.of(solicitud));
         when(solicitudRepository.save(any())).thenReturn(solicitud);
         when(historialRepository.save(any())).thenReturn(null);
 
-        solicitudService.cerrarSolicitud(1L, cierreDTO);
+        solicitudService.cerrarSolicitud(888L, cierreDTO);
 
         assertEquals(EstadoSolicitud.CERRADA, solicitud.getEstado());
         assertNotNull(solicitud.getFechaCierre());
@@ -105,21 +107,23 @@ class SolicitudServiceTest {
     @Test
     void cerrarSolicitud_estadoInvalido_lanzaExcepcion() {
         Solicitud solicitud = Solicitud.builder()
+                .id(12L)
                 .estado(EstadoSolicitud.REGISTRADA)
                 .build();
 
         CierreDTO cierreDTO = new CierreDTO(null, "observacion", null);
 
-        when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+        when(solicitudRepository.findById(12L)).thenReturn(Optional.of(solicitud));
 
         assertThrows(IllegalStateException.class, () -> {
-            solicitudService.cerrarSolicitud(1L, cierreDTO);
+            solicitudService.cerrarSolicitud(12L, cierreDTO);
         });
     }
 
     // PRUEBA 5: Asignar responsable inactivo — debe fallar
     @Test
     void asignarResponsable_inactivo_lanzaExcepcion() {
+        //poner el id
         Solicitud solicitud = Solicitud.builder()
                 .estado(EstadoSolicitud.CLASIFICADA)
                 .build();

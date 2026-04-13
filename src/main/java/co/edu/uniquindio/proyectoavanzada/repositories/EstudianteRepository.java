@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
     // Para buscar por correo si lo necesitas más adelante
     Optional<Estudiante> findByCorreo(String correo);
+    Optional<Estudiante> findByUsername(String username);
 }
