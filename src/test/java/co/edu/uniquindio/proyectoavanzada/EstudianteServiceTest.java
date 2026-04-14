@@ -7,8 +7,12 @@ import co.edu.uniquindio.proyectoavanzada.entities.enums.ProgramaAcademico;
 import co.edu.uniquindio.proyectoavanzada.excepciones.RecursoNoEncontradoException;
 import co.edu.uniquindio.proyectoavanzada.repositories.EstudianteRepository;
 import co.edu.uniquindio.proyectoavanzada.services.impl.EstudianteServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,99 +21,313 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+// =============================================================================
+//  CLASE 2 — EstudianteServiceTest
+//  Cubre: crear, actualizar, eliminar, obtener y listar estudiantes
+// =============================================================================
 @ExtendWith(MockitoExtension.class)
+@DisplayName("EstudianteService — Tests Unitarios Completos")
 class EstudianteServiceTest {
 
     @Mock private EstudianteRepository estudianteRepository;
     @Mock private PasswordEncoder passwordEncoder;
+    @InjectMocks private EstudianteServiceImpl estudianteService;
 
-    @InjectMocks
-    private EstudianteServiceImpl estudianteService;
+    private Estudiante estudianteExistente;
+    private CrearEstudianteDTO crearDTO;
+    private EstudianteDTO actualizarDTO;
 
-    // PRUEBA 1: Crear estudiante exitosamente
-    @Test
-    void crearEstudiante_exitoso() {
-        CrearEstudianteDTO dto = new CrearEstudianteDTO(
-                "Andrés Torres",
-                "andres@uniquindio.edu.co",
-                "est001",        // username
-                "est123",        // password
+    @BeforeEach
+    void setUp() {
+        estudianteExistente = new Estudiante();
+        estudianteExistente.setId(1L);
+        estudianteExistente.setNombreCompleto("Mariana Ramírez");
+        estudianteExistente.setCorreo("mariana@uniquindio.edu.co");
+        estudianteExistente.setPrograma(ProgramaAcademico.ING_SISTEMAS);
+
+        crearDTO = new CrearEstudianteDTO(
+                "Mariana Ramírez",
+                "mariana@uniquindio.edu.co",
+                "mariana.ramirez",        // ← username
+                "pass1234",
                 ProgramaAcademico.ING_SISTEMAS
         );
 
-        Estudiante guardado = Estudiante.builder()
-                .nombreCompleto("Andrés Torres")
-                .correo("andres@uniquindio.edu.co")
-                .programa(ProgramaAcademico.ING_SISTEMAS)
-                .build();
-
-        when(passwordEncoder.encode("est123")).thenReturn("$2a$hash");
-        when(estudianteRepository.save(any())).thenReturn(guardado);
-
-        estudianteService.crearEstudiante(dto);
-
-        verify(estudianteRepository, times(1)).save(any());
+        actualizarDTO = new EstudianteDTO(1L,
+                "Valentina N. Actualizada",
+                "valentina.nueva@uniquindio.edu.co",
+                ProgramaAcademico.MEDICINA);
     }
 
-    // PRUEBA 2: Obtener estudiante exitosamente
-    @Test
-    void obtenerEstudiante_exitoso() {
-        Estudiante estudiante = Estudiante.builder()
-                .nombreCompleto("Laura Gómez")
-                .correo("laura@uniquindio.edu.co")
-                .programa(ProgramaAcademico.ING_SISTEMAS)
-                .build();
+    // ─── crearEstudiante ──────────────────────────────────────────────────────
+    @Nested
+    @DisplayName("crearEstudiante")
+    class CrearEstudianteTests {
 
-        when(estudianteRepository.findById(1L)).thenReturn(Optional.of(estudiante));
+        @Test
+        @DisplayName("should_retornarId_when_datosValidos")
+        void should_retornarId_when_datosValidos() {
+            Estudiante guardado = new Estudiante();
+            guardado.setId(5L);
+            when(passwordEncoder.encode("pass1234")).thenReturn("hashedPass");
+            when(estudianteRepository.save(any())).thenReturn(guardado);
 
-        EstudianteDTO resultado = estudianteService.obtenerEstudiante(1L);
+            assertEquals(5L, estudianteService.crearEstudiante(crearDTO));
+            verify(estudianteRepository, times(1)).save(any());
+        }
 
-        assertNotNull(resultado);
-        assertEquals("Laura Gómez", resultado.nombreCompleto());
+        @Test
+        @DisplayName("should_cifrarPassword_when_crearEstudiante")
+        void should_cifrarPassword_when_crearEstudiante() {
+            ArgumentCaptor<Estudiante> captor = ArgumentCaptor.forClass(Estudiante.class);
+            Estudiante guardado = new Estudiante();
+            guardado.setId(1L);
+
+            when(passwordEncoder.encode("pass1234")).thenReturn("$2a$10$hashedValue");
+            when(estudianteRepository.save(captor.capture())).thenReturn(guardado);
+
+            estudianteService.crearEstudiante(crearDTO);
+
+            assertNotEquals("pass1234", captor.getValue().getPassword(),
+                    "La contraseña NO debe guardarse en texto plano");
+            verify(passwordEncoder, times(1)).encode("pass1234");
+        }
+
+        @Test
+        @DisplayName("should_mapearCamposCorrectamente_when_crearEstudiante")
+        void should_mapearCamposCorrectamente_when_crearEstudiante() {
+            ArgumentCaptor<Estudiante> captor = ArgumentCaptor.forClass(Estudiante.class);
+            Estudiante guardado = new Estudiante();
+            guardado.setId(3L);
+            when(passwordEncoder.encode(anyString())).thenReturn("hashed");
+            when(estudianteRepository.save(captor.capture())).thenReturn(guardado);
+
+            estudianteService.crearEstudiante(crearDTO);
+
+            // ✅ captor.getValue() obtiene el objeto que fue pasado a save()
+            Estudiante capturado = captor.getValue();
+
+            assertAll(
+                    () -> assertEquals(crearDTO.nombreCompleto(), capturado.getNombreCompleto()),
+                    () -> assertEquals(crearDTO.correo(),         capturado.getCorreo()),
+                    () -> assertEquals(crearDTO.programa(),       capturado.getPrograma())
+            );
+        }
     }
 
-    // PRUEBA 3: Obtener estudiante que no existe
-    @Test
-    void obtenerEstudiante_noExiste_lanzaExcepcion() {
-        when(estudianteRepository.findById(99L)).thenReturn(Optional.empty());
+    // ─── actualizarEstudiante ─────────────────────────────────────────────────
+    @Nested
+    @DisplayName("actualizarEstudiante")
+    class ActualizarEstudianteTests {
 
-        assertThrows(RecursoNoEncontradoException.class, () ->
-                estudianteService.obtenerEstudiante(99L)
-        );
+        @Test
+        @DisplayName("should_actualizarNombreCorreo_when_datosNuevosValidos")
+        void should_actualizarNombreCorreo_when_datosNuevosValidos() {
+            EstudianteDTO nuevos = new EstudianteDTO(1L,
+                    "Mariana Ramírez Colorado",
+                    "mariana.colorado@uniquindio.edu.co",
+                    ProgramaAcademico.ING_SISTEMAS);
+
+            when(estudianteRepository.findById(1L))
+                    .thenReturn(Optional.of(estudianteExistente));
+            when(estudianteRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+            estudianteService.actualizarEstudiante(1L, nuevos);
+
+            assertAll(
+                    () -> assertEquals("Mariana Ramírez Colorado",
+                            estudianteExistente.getNombreCompleto()),
+                    () -> assertEquals("mariana.colorado@uniquindio.edu.co",
+                            estudianteExistente.getCorreo())
+            );
+        }
+
+        @Test
+        @DisplayName("should_cambiarPrograma_when_estudianteCambiaCarrera")
+        void should_cambiarPrograma_when_estudianteCambiaCarrera() {
+            EstudianteDTO nuevos = new EstudianteDTO(1L,
+                    "Mariana Ramírez",
+                    "mariana@uniquindio.edu.co",
+                    ProgramaAcademico.MEDICINA);
+
+            when(estudianteRepository.findById(1L))
+                    .thenReturn(Optional.of(estudianteExistente));
+            when(estudianteRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+            estudianteService.actualizarEstudiante(1L, nuevos);
+
+            assertEquals(ProgramaAcademico.MEDICINA, estudianteExistente.getPrograma());
+        }
+
+        @Test
+        @DisplayName("should_persistirCambios_when_actualizarEstudiante")
+        void should_persistirCambios_when_actualizarEstudiante() {
+            when(estudianteRepository.findById(1L))
+                    .thenReturn(Optional.of(estudianteExistente));
+            when(estudianteRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+            estudianteService.actualizarEstudiante(1L, actualizarDTO);
+
+            verify(estudianteRepository, times(1)).save(estudianteExistente);
+        }
+
+        @Test
+        @DisplayName("should_lanzarRecursoNoEncontrado_when_idInexistente")
+        void should_lanzarRecursoNoEncontrado_when_idInexistente() {
+            when(estudianteRepository.findById(999L)).thenReturn(Optional.empty());
+
+            assertThrows(RecursoNoEncontradoException.class,
+                    () -> estudianteService.actualizarEstudiante(999L, actualizarDTO));
+            verify(estudianteRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("should_noActualizarPassword_when_actualizarEstudiante")
+        void should_noActualizarPassword_when_actualizarEstudiante() {
+            when(estudianteRepository.findById(1L))
+                    .thenReturn(Optional.of(estudianteExistente));
+            when(estudianteRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+            estudianteService.actualizarEstudiante(1L, actualizarDTO);
+
+            verifyNoInteractions(passwordEncoder);
+        }
     }
 
-    // PRUEBA 4: Listar estudiantes
-    @Test
-    void listarEstudiantes_exitoso() {
-        Estudiante e1 = Estudiante.builder()
-                .nombreCompleto("Andrés Torres")
-                .correo("andres@uniquindio.edu.co")
-                .programa(ProgramaAcademico.ING_SISTEMAS)
-                .build();
+    // ─── eliminarEstudiante ───────────────────────────────────────────────────
+    @Nested
+    @DisplayName("eliminarEstudiante")
+    class EliminarEstudianteTests {
 
-        Estudiante e2 = Estudiante.builder()
-                .nombreCompleto("Laura Gómez")
-                .correo("laura@uniquindio.edu.co")
-                .programa(ProgramaAcademico.ING_SISTEMAS)
-                .build();
+        @Test
+        @DisplayName("should_eliminarEstudiante_when_idExistente")
+        void should_eliminarEstudiante_when_idExistente() {
+            when(estudianteRepository.existsById(1L)).thenReturn(true);
 
-        when(estudianteRepository.findAll()).thenReturn(List.of(e1, e2));
+            estudianteService.eliminarEstudiante(1L);
 
-        List<EstudianteDTO> resultado = estudianteService.listarEstudiantes();
+            verify(estudianteRepository, times(1)).deleteById(1L);
+        }
 
-        assertEquals(2, resultado.size());
+        @Test
+        @DisplayName("should_lanzarRecursoNoEncontrado_when_idInexistenteEnEliminar")
+        void should_lanzarRecursoNoEncontrado_when_idInexistenteEnEliminar() {
+            when(estudianteRepository.existsById(999L)).thenReturn(false);
+
+            assertThrows(RecursoNoEncontradoException.class,
+                    () -> estudianteService.eliminarEstudiante(999L));
+            verify(estudianteRepository, never()).deleteById(any());
+        }
     }
 
-    // PRUEBA 5: Eliminar estudiante que no existe
-    @Test
-    void eliminarEstudiante_noExiste_lanzaExcepcion() {
-        when(estudianteRepository.existsById(99L)).thenReturn(false);
+    // ─── obtenerEstudiante ────────────────────────────────────────────────────
+    @Nested
+    @DisplayName("obtenerEstudiante")
+    class ObtenerEstudianteTests {
 
-        assertThrows(RecursoNoEncontradoException.class, () ->
-                estudianteService.eliminarEstudiante(99L)
-        );
+        @Test
+        @DisplayName("should_retornarDTO_when_idExistente")
+        void should_retornarDTO_when_idExistente() {
+            when(estudianteRepository.findById(1L))
+                    .thenReturn(Optional.of(estudianteExistente));
+
+            EstudianteDTO resultado = estudianteService.obtenerEstudiante(1L);
+
+            assertAll(
+                    () -> assertEquals(estudianteExistente.getId(),
+                            resultado.id()),
+                    () -> assertEquals(estudianteExistente.getNombreCompleto(),
+                            resultado.nombreCompleto()),
+                    () -> assertEquals(estudianteExistente.getCorreo(),
+                            resultado.correo()),
+                    () -> assertEquals(estudianteExistente.getPrograma(),
+                            resultado.programa())
+            );
+        }
+
+        @Test
+        @DisplayName("should_lanzarRecursoNoEncontrado_when_idInexistenteEnObtener")
+        void should_lanzarRecursoNoEncontrado_when_idInexistenteEnObtener() {
+            when(estudianteRepository.findById(404L)).thenReturn(Optional.empty());
+
+            RecursoNoEncontradoException ex = assertThrows(
+                    RecursoNoEncontradoException.class,
+                    () -> estudianteService.obtenerEstudiante(404L));
+            assertThat(ex.getMessage()).containsIgnoringCase("estudiante");
+        }
+    }
+
+    // ─── listarEstudiantes ────────────────────────────────────────────────────
+    @Nested
+    @DisplayName("listarEstudiantes")
+    class ListarEstudiantesTests {
+
+        @Test
+        @DisplayName("should_retornarListaVacia_when_noHayEstudiantes")
+        void should_retornarListaVacia_when_noHayEstudiantes() {
+            when(estudianteRepository.findAll()).thenReturn(List.of());
+
+            assertTrue(estudianteService.listarEstudiantes().isEmpty());
+        }
+
+        @Test
+        @DisplayName("should_retornarListaConTresEstudiantes_when_hayTresRegistros")
+        void should_retornarListaConTresEstudiantes_when_hayTresRegistros() {
+            Estudiante e1 = crearEstudiante(1L, "Mariana Ramírez",
+                    "mariana@uniquindio.edu.co",   ProgramaAcademico.ING_SISTEMAS);
+            Estudiante e2 = crearEstudiante(2L, "Yamileth Londoño",
+                    "jhaineth@uniquindio.edu.co",  ProgramaAcademico.ING_SISTEMAS);
+            Estudiante e3 = crearEstudiante(3L, "Andrés Ospina",
+                    "andres@uniquindio.edu.co",    ProgramaAcademico.MEDICINA);
+
+            when(estudianteRepository.findAll()).thenReturn(List.of(e1, e2, e3));
+
+            List<EstudianteDTO> resultado = estudianteService.listarEstudiantes();
+
+            assertAll(
+                    () -> assertEquals(3, resultado.size()),
+                    () -> assertEquals("Mariana Ramírez",  resultado.get(0).nombreCompleto()),
+                    () -> assertEquals("Yamileth Londoño", resultado.get(1).nombreCompleto()),
+                    () -> assertEquals("Andrés Ospina",
+                            resultado.get(2).nombreCompleto())
+            );
+        }
+
+        @Test
+        @DisplayName("should_mapearProgramaAcademico_when_listarEstudiantes")
+        void should_mapearProgramaAcademico_when_listarEstudiantes() {
+            Estudiante e = crearEstudiante(2L, "Yamileth Londoño",
+                    "yamileth@uniquindio.edu.co", ProgramaAcademico.MEDICINA);
+            when(estudianteRepository.findAll()).thenReturn(List.of(e));
+
+            assertEquals(ProgramaAcademico.MEDICINA,
+                    estudianteService.listarEstudiantes().get(0).programa());
+        }
+
+        @Test
+        @DisplayName("should_mapearCorreoCorrectamente_when_listarEstudiantes")
+        void should_mapearCorreoCorrectamente_when_listarEstudiantes() {
+            Estudiante e = crearEstudiante(1L, "Mariana Ramírez",
+                    "mariana@uniquindio.edu.co", ProgramaAcademico.ING_SISTEMAS);
+            when(estudianteRepository.findAll()).thenReturn(List.of(e));
+
+            assertEquals("mariana@uniquindio.edu.co",
+                    estudianteService.listarEstudiantes().get(0).correo());
+        }
+    }
+
+    // helper
+    private Estudiante crearEstudiante(Long id, String nombre,
+                                       String correo, ProgramaAcademico programa) {
+        Estudiante e = new Estudiante();
+        e.setId(id);
+        e.setNombreCompleto(nombre);
+        e.setCorreo(correo);
+        e.setPrograma(programa);
+        return e;
     }
 }

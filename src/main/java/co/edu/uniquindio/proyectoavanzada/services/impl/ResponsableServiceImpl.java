@@ -83,4 +83,6 @@ public class ResponsableServiceImpl implements ResponsableService {
                 Boolean.TRUE.equals(r.getActivo())
         );
     }
+
+
 }

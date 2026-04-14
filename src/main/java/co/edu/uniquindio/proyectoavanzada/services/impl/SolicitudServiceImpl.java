@@ -56,12 +56,19 @@ public class SolicitudServiceImpl implements SolicitudService {
     }
 
     // 3. Proceso de Triage (Asignar Prioridad)
+    // ✅ DESPUÉS
     @Override
     public Solicitud realizarTriage(Long id, PrioridadDTO prioridadDTO) {
         Solicitud solicitud = solicitudRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "Solicitud no encontrada con ID: " + id));
 
-        // Convertimos el String del DTO al Enum que pide la Entidad
+        if (solicitud.getEstado() != EstadoSolicitud.REGISTRADA) {
+            throw new IllegalStateException(
+                    "Solo se puede realizar triage a solicitudes en estado REGISTRADA. " +
+                            "Estado actual: " + solicitud.getEstado());
+        }
+
         Prioridad prioridad = Prioridad.builder()
                 .nivel(prioridadDTO.nivel())
                 .impactoAcademico(prioridadDTO.impactoAcademico())
@@ -69,24 +76,22 @@ public class SolicitudServiceImpl implements SolicitudService {
                 .vigencia(prioridadDTO.vigencia())
                 .build();
 
-        // Guardamos el historial del cambio
         Historial h = Historial.builder()
                 .fechaHora(LocalDateTime.now())
                 .estadoAnterior(solicitud.getEstado())
                 .estadoNuevo(EstadoSolicitud.CLASIFICADA)
-                .observaciones("Se realizó el triage y se asignó prioridad " + prioridad.getNivel())
+                .observaciones("Se realizó el triage y se asignó prioridad "
+                        + prioridad.getNivel())
                 .solicitud(solicitud)
                 .build();
 
         historialRepository.save(h);
 
-        // Actualizamos la solicitud
         solicitud.setPrioridad(prioridad);
         solicitud.setEstado(EstadoSolicitud.CLASIFICADA);
 
         return solicitudRepository.save(solicitud);
     }
-
     // 4. Asignar Responsable
     @Override
     public Solicitud asignarResponsable(Long idSolicitud, Long idResponsable) {
