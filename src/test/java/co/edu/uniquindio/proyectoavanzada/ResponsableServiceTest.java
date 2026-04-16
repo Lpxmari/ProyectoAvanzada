@@ -24,10 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-// =============================================================================
-//  CLASE 3 — ResponsableServiceTest
+
 //  Cubre: listar activos, crear, obtener, actualizar y soft-delete
-// =============================================================================
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ResponsableService — Tests Unitarios Completos")
 class ResponsableServiceTest {
@@ -53,7 +52,10 @@ class ResponsableServiceTest {
                 "Docente", true, true);
     }
 
-    // ─── listarActivos ────────────────────────────────────────────────────────
+
+
+    // listarActivos
+
     @Nested
     @DisplayName("listarActivos")
     class ListarActivosTests {
@@ -116,7 +118,10 @@ class ResponsableServiceTest {
         }
     }
 
-    // ─── crearResponsable ─────────────────────────────────────────────────────
+
+
+    // crearResponsable
+
     @Nested
     @DisplayName("crearResponsable")
     class CrearResponsableTests {
@@ -147,7 +152,10 @@ class ResponsableServiceTest {
         }
     }
 
-    // ─── obtenerPorId ─────────────────────────────────────────────────────────
+
+
+    // obtenerPorId
+
     @Nested
     @DisplayName("obtenerPorId")
     class ObtenerPorIdTests {
@@ -187,7 +195,10 @@ class ResponsableServiceTest {
         }
     }
 
-    // ─── actualizarResponsable ────────────────────────────────────────────────
+
+
+    // actualizarResponsable
+
     @Nested
     @DisplayName("actualizarResponsable")
     class ActualizarResponsableTests {
@@ -259,7 +270,9 @@ class ResponsableServiceTest {
         }
     }
 
-    // ─── eliminarResponsable (soft delete) ────────────────────────────────────
+
+
+    // eliminarResponsable (soft delete)
     @Nested
     @DisplayName("eliminarResponsable — Soft Delete")
     class EliminarResponsableTests {
@@ -305,7 +318,13 @@ class ResponsableServiceTest {
         }
     }
 
-    // helper
+
+    // helper (Es un método helper privado que fabrica objetos Responsable listos
+    //  para usar en las pruebas, evitando repetir las mismas líneas de construcción
+    //  cada vez que necesito crear uno nuevo. Este método maneja dos campos
+    //  extra: activo y deleted, porque Responsable los necesita para las pruebas de
+    //  soft delete y filtrado de activos.)
+
     private Responsable crearResponsable(Long id, String nombre,
                                          String cargo, boolean activo, boolean deleted) {
         Responsable r = new Responsable();

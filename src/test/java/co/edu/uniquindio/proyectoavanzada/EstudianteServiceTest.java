@@ -25,10 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-// =============================================================================
-//  CLASE 2 — EstudianteServiceTest
+
 //  Cubre: crear, actualizar, eliminar, obtener y listar estudiantes
-// =============================================================================
+
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("EstudianteService — Tests Unitarios Completos")
 class EstudianteServiceTest {
@@ -63,7 +63,10 @@ class EstudianteServiceTest {
                 ProgramaAcademico.MEDICINA);
     }
 
-    // ─── crearEstudiante ──────────────────────────────────────────────────────
+
+
+    //  crearEstudiante
+
     @Nested
     @DisplayName("crearEstudiante")
     class CrearEstudianteTests {
@@ -108,7 +111,7 @@ class EstudianteServiceTest {
 
             estudianteService.crearEstudiante(crearDTO);
 
-            // ✅ captor.getValue() obtiene el objeto que fue pasado a save()
+
             Estudiante capturado = captor.getValue();
 
             assertAll(
@@ -119,7 +122,10 @@ class EstudianteServiceTest {
         }
     }
 
-    // ─── actualizarEstudiante ─────────────────────────────────────────────────
+
+
+    // actualizarEstudiante
+
     @Nested
     @DisplayName("actualizarEstudiante")
     class ActualizarEstudianteTests {
@@ -198,7 +204,10 @@ class EstudianteServiceTest {
         }
     }
 
-    // ─── eliminarEstudiante ───────────────────────────────────────────────────
+
+
+    // eliminarEstudiante
+
     @Nested
     @DisplayName("eliminarEstudiante")
     class EliminarEstudianteTests {
@@ -224,7 +233,10 @@ class EstudianteServiceTest {
         }
     }
 
-    // ─── obtenerEstudiante ────────────────────────────────────────────────────
+
+
+    // obtenerEstudiante
+
     @Nested
     @DisplayName("obtenerEstudiante")
     class ObtenerEstudianteTests {
@@ -261,7 +273,10 @@ class EstudianteServiceTest {
         }
     }
 
-    // ─── listarEstudiantes ────────────────────────────────────────────────────
+
+
+    // listarEstudiantes
+
     @Nested
     @DisplayName("listarEstudiantes")
     class ListarEstudiantesTests {
@@ -320,7 +335,13 @@ class EstudianteServiceTest {
         }
     }
 
-    // helper
+
+
+    // helper (Este es un método privado que fabrica objetos Estudiante
+    //  listos para usar en las pruebas sin necesidad de repetir su
+    //  construcción escribiendo las mismas líneas cada vez que necesite uno.
+    //  Solo es un atajo que optimiza el código)
+
     private Estudiante crearEstudiante(Long id, String nombre,
                                        String correo, ProgramaAcademico programa) {
         Estudiante e = new Estudiante();

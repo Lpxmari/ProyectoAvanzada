@@ -25,7 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-//  Cubre: login exitoso, usuario inexistente, inactivo, contraseña incorrecta
+//  Cubre: login exitoso, usuario no encontrado, usuario inactivo, contraseña
+//  incorrecta
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AuthService — Tests Unitarios Completos")
@@ -40,13 +41,15 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        usuarioActivo = new Estudiante(); // ← Estudiante para que getRol() devuelva "ROLE_ESTUDIANTE"
+        usuarioActivo = new Estudiante();
         usuarioActivo.setId(1L);
         usuarioActivo.setUsername("mariana.ramirez");
         usuarioActivo.setPassword("$2a$10$hashedPassword");
         usuarioActivo.setActivo(true);
-        // ← setRol() eliminado — el rol se infiere automáticamente por instanceof
     }
+
+
+    //Login exitoso
 
     @Nested
     @DisplayName("login — casos exitosos")
@@ -73,7 +76,6 @@ class AuthServiceTest {
         @Test
         @DisplayName("should_generarTokenConRolCorrecto_when_usuarioEsResponsable")
         void should_generarTokenConRolCorrecto_when_usuarioEsResponsable() {
-            // Arrange — usar Responsable para que getRol() devuelva "ROLE_RESPONSABLE"
             Responsable responsable = new Responsable();
             responsable.setUsername("prof.martinez");
             responsable.setPassword("$2a$10$hash2");
@@ -85,7 +87,6 @@ class AuthServiceTest {
             when(jwtUtil.generarToken("prof.martinez", "ROLE_RESPONSABLE"))
                     .thenReturn("tokenResponsable");
 
-            // Act & Assert
             assertEquals("tokenResponsable",
                     authService.login(new LoginRequest("prof.martinez", "clave")));
             verify(jwtUtil).generarToken("prof.martinez", "ROLE_RESPONSABLE");
@@ -104,6 +105,10 @@ class AuthServiceTest {
             verify(passwordEncoder).matches(anyString(), anyString());
         }
     }
+
+
+
+    //Usuario no encontrado
 
     @Nested
     @DisplayName("login — usuario no encontrado")
@@ -144,6 +149,9 @@ class AuthServiceTest {
         }
     }
 
+
+    // Usuario inactivo
+
     @Nested
     @DisplayName("login — usuario inactivo")
     class LoginUsuarioInactivoTests {
@@ -174,6 +182,9 @@ class AuthServiceTest {
             verifyNoInteractions(jwtUtil);
         }
     }
+
+
+    // Contraseña incorrecta
 
     @Nested
     @DisplayName("login — contraseña incorrecta")

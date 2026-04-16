@@ -22,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+// Cubre: registrarSolicitud, realizarTriage, asignarResponsable,
+// marcarComoAtendida, cerrarSolicitud, consultas y listados, transacciones
+// de estado
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SolicitudService — Tests Unitarios Completos")
@@ -52,7 +55,7 @@ class SolicitudServiceTest {
         responsableActivo.setDeleted(false);
     }
 
-    // 1. Pruebas para registrarSolicitud
+    // registrarSolicitud
 
     @Nested
     @DisplayName("registrarSolicitud")
@@ -127,9 +130,9 @@ class SolicitudServiceTest {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 2. realizarTriage
-    // ─────────────────────────────────────────────────────────────────────────
+
+    // realizarTriage
+
     @Nested
     @DisplayName("realizarTriage")
     class RealizarTriageTests {
@@ -158,19 +161,19 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_asignarNivelDePrioridad_when_triageExitoso")
         void should_asignarNivelDePrioridad_when_triageExitoso() {
-            // Arrange
+
             Solicitud solicitud = Solicitud.builder()
                     .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
 
             when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            // Act
+
             Solicitud resultado = solicitudService.realizarTriage(1L,
                     new PrioridadDTO(NivelSolicitud.BAJA, "Bajo", "Sin urgencia", null)            );
 
-            // Assert — verificamos el nivel, que sí está definido en la entidad
             assertEquals(NivelSolicitud.BAJA, resultado.getPrioridad().getNivel());        }
+
 
         @Test
         @DisplayName("should_guardarSolicitudConEstadoClasificada_when_triageExitoso")
@@ -197,18 +200,18 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_registrarDescripcionEnPrioridad_when_triageConDescripcion")
         void should_registrarDescripcionEnPrioridad_when_triageConDescripcion() {
-            // Arrange
+
             Solicitud solicitud = Solicitud.builder()
                     .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
 
             when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            // Act
+
             Solicitud resultado = solicitudService.realizarTriage(1L,
                     new PrioridadDTO(NivelSolicitud.BAJA, "Bajo", "Sin urgencia inmediata", null));
 
-            // Assert — verificamos justificacion en la entidad Prioridad
+
             assertEquals("Sin urgencia inmediata", resultado.getPrioridad().getJustificacion());
         }
 
@@ -248,7 +251,7 @@ class SolicitudServiceTest {
             );
         }
 
-        // java
+
         @Test
         @DisplayName("should_registrarHistorial_when_triageExitoso")
         void should_registrarHistorial_when_triageExitoso() {
@@ -265,7 +268,7 @@ class SolicitudServiceTest {
                     LocalDate.now()
             );
 
-            // Invocar el método bajo prueba
+
             solicitudService.realizarTriage(1L, dto);
 
             verify(historialRepository, atLeastOnce()).save(any(Historial.class));
@@ -273,9 +276,10 @@ class SolicitudServiceTest {
 
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+
+
     // 3. asignarResponsable
-    // ─────────────────────────────────────────────────────────────────────────
+
     @Nested
     @DisplayName("asignarResponsable")
     class AsignarResponsableTests {
@@ -313,6 +317,7 @@ class SolicitudServiceTest {
                     resultado.getResponsableAsignado().getNombreCompleto());
         }
 
+
         @Test
         @DisplayName("should_persistirCambios_when_asignacionExitosa")
         void should_persistirCambios_when_asignacionExitosa() {
@@ -327,6 +332,7 @@ class SolicitudServiceTest {
 
             verify(solicitudRepository, times(1)).save(solicitud);
         }
+
 
         @Test
         @DisplayName("should_lanzarIllegalState_when_responsableInactivo")
@@ -357,6 +363,7 @@ class SolicitudServiceTest {
                     () -> solicitudService.asignarResponsable(1L, 10L));
         }
 
+
         @Test
         @DisplayName("should_lanzarRecursoNoEncontrado_when_responsableInexistente")
         void should_lanzarRecursoNoEncontrado_when_responsableInexistente() {
@@ -369,6 +376,7 @@ class SolicitudServiceTest {
             assertThrows(RecursoNoEncontradoException.class,
                     () -> solicitudService.asignarResponsable(1L, 99L));
         }
+
 
         @Test
         @DisplayName("should_registrarHistorial_when_asignacionExitosa")
@@ -386,9 +394,10 @@ class SolicitudServiceTest {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 4. marcarComoAtendida
-    // ─────────────────────────────────────────────────────────────────────────
+
+
+    // marcarComoAtendida
+
     @Nested
     @DisplayName("marcarComoAtendida")
     class MarcarComoAtendidaTests {
@@ -464,9 +473,10 @@ class SolicitudServiceTest {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 5. cerrarSolicitud
-    // ─────────────────────────────────────────────────────────────────────────
+
+
+    // cerrarSolicitud
+
     @Nested
     @DisplayName("cerrarSolicitud")
     class CerrarSolicitudTests {
@@ -501,6 +511,7 @@ class SolicitudServiceTest {
             assertThat(solicitud.getFechaCierre()).isAfter(antes);
         }
 
+
         @Test
         @DisplayName("should_lanzarIllegalState_when_solicitudRegistrada")
         void should_lanzarIllegalState_when_solicitudRegistrada() {
@@ -512,6 +523,7 @@ class SolicitudServiceTest {
                     () -> solicitudService.cerrarSolicitud(1L,
                             new CierreDTO(null, "obs", null)));
         }
+
 
         @Test
         @DisplayName("should_lanzarIllegalState_when_solicitudEnAtencion")
@@ -525,6 +537,7 @@ class SolicitudServiceTest {
                             new CierreDTO(null, "obs", null)));
         }
 
+
         @Test
         @DisplayName("should_lanzarIllegalState_when_solicitudClasificada")
         void should_lanzarIllegalState_when_solicitudClasificada() {
@@ -537,6 +550,7 @@ class SolicitudServiceTest {
                             new CierreDTO(null, "obs", null)));
         }
 
+
         @Test
         @DisplayName("should_lanzarRecursoNoEncontrado_when_idInexistente")
         void should_lanzarRecursoNoEncontrado_when_idInexistente() {
@@ -546,6 +560,7 @@ class SolicitudServiceTest {
                     () -> solicitudService.cerrarSolicitud(404L,
                             new CierreDTO(null, "obs", null)));
         }
+
 
         @Test
         @DisplayName("should_registrarHistorial_when_cierreExitoso")
@@ -562,9 +577,10 @@ class SolicitudServiceTest {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // 6. Consultas — listar, obtener, filtrar
-    // ─────────────────────────────────────────────────────────────────────────
+
+
+    // Consultas — listar, obtener, filtrar
+
     @Nested
     @DisplayName("consultas y listados")
     class ConsultasTests {
@@ -585,6 +601,7 @@ class SolicitudServiceTest {
             assertEquals(1L, resultado.id());
         }
 
+
         @Test
         @DisplayName("should_lanzarRecursoNoEncontrado_when_idInexistenteEnObtener")
         void should_lanzarRecursoNoEncontrado_when_idInexistenteEnObtener() {
@@ -593,6 +610,7 @@ class SolicitudServiceTest {
             assertThrows(RecursoNoEncontradoException.class,
                     () -> solicitudService.obtenerPorId(999L));
         }
+
 
         @Test
         @DisplayName("should_retornarListaVacia_when_noHaySolicitudes")
@@ -604,6 +622,7 @@ class SolicitudServiceTest {
             assertNotNull(resultado);
             assertTrue(resultado.isEmpty());
         }
+
 
         @Test
         @DisplayName("should_retornarTresSolicitudes_when_hayTresRegistros")
@@ -617,6 +636,7 @@ class SolicitudServiceTest {
             assertEquals(3, solicitudService.listarTodas().size());
         }
 
+
         @Test
         @DisplayName("should_incluirTodosLosEstados_when_listarTodas")
         void should_incluirTodosLosEstados_when_listarTodas() {
@@ -627,6 +647,7 @@ class SolicitudServiceTest {
             assertEquals(2, solicitudService.listarTodas().size());
         }
 
+
         @Test
         @DisplayName("should_mapearIdCorrectamente_when_listarTodas")
         void should_mapearIdCorrectamente_when_listarTodas() {
@@ -636,7 +657,9 @@ class SolicitudServiceTest {
             assertEquals(42L, solicitudService.listarTodas().get(0).id());
         }
 
+
         // listarPorEstado
+
         @Test
         @DisplayName("should_retornarSoloRegistradas_when_filtroRegistrada")
         void should_retornarSoloRegistradas_when_filtroRegistrada() {
@@ -653,6 +676,7 @@ class SolicitudServiceTest {
                     .containsOnly(EstadoSolicitud.REGISTRADA);
         }
 
+
         @Test
         @DisplayName("should_retornarSoloEnAtencion_when_filtroEnAtencion")
         void should_retornarSoloEnAtencion_when_filtroEnAtencion() {
@@ -667,6 +691,7 @@ class SolicitudServiceTest {
             assertEquals(EstadoSolicitud.EN_ATENCION, resultado.get(0).estado());
         }
 
+
         @Test
         @DisplayName("should_retornarListaVacia_when_noHaySolicitudesEnEseEstado")
         void should_retornarListaVacia_when_noHaySolicitudesEnEseEstado() {
@@ -675,6 +700,7 @@ class SolicitudServiceTest {
 
             assertTrue(solicitudService.listarPorEstado(EstadoSolicitud.CERRADA).isEmpty());
         }
+
 
         @Test
         @DisplayName("should_noMezclarEstados_when_filtrarPorClasificada")
@@ -690,7 +716,10 @@ class SolicitudServiceTest {
             assertEquals(EstadoSolicitud.CLASIFICADA, resultado.get(0).estado());
         }
 
+
+
         // obtenerHistorial
+
         @Test
         @DisplayName("should_retornarHistorialOrdenado_when_solicitudConVariosCambios")
         void should_retornarHistorialOrdenado_when_solicitudConVariosCambios() {
@@ -711,6 +740,7 @@ class SolicitudServiceTest {
             assertEquals("Responsable asignado",   resultado.get(2).observaciones());
         }
 
+
         @Test
         @DisplayName("should_retornarListaVacia_when_solicitudSinHistorial")
         void should_retornarListaVacia_when_solicitudSinHistorial() {
@@ -718,6 +748,7 @@ class SolicitudServiceTest {
                     .thenReturn(List.of());
             assertTrue(solicitudService.obtenerHistorial(99L).isEmpty());
         }
+
 
         @Test
         @DisplayName("should_mapearFechaEnHistorial_when_obtenerHistorial")
@@ -730,6 +761,7 @@ class SolicitudServiceTest {
                     solicitudService.obtenerHistorial(1L).get(0).fechaHora());
         }
 
+
         @Test
         @DisplayName("should_mapearDescripcionEnHistorial_when_obtenerHistorial")
         void should_mapearDescripcionEnHistorial_when_obtenerHistorial() {
@@ -741,6 +773,7 @@ class SolicitudServiceTest {
                     solicitudService.obtenerHistorial(1L).get(0).observaciones());
         }
 
+
         @Test
         @DisplayName("should_listarPorEstudiante_when_estudianteConSolicitudes")
         void should_listarPorEstudiante_when_estudianteConSolicitudes() {
@@ -749,6 +782,7 @@ class SolicitudServiceTest {
 
             assertEquals(1, solicitudService.listarPorEstudiante(1L).size());
         }
+
 
         @Test
         @DisplayName("should_listarPorResponsable_when_responsableConSolicitudes")
@@ -766,12 +800,8 @@ class SolicitudServiceTest {
 
 
 
+    // Transiciones de estado — máquina de estados completa
 
-
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // 7. Transiciones de estado — máquina de estados completa
-    // ─────────────────────────────────────────────────────────────────────────
     @Nested
     @DisplayName("transiciones de estado")
     class TransicionesEstadoTests {
@@ -796,6 +826,7 @@ class SolicitudServiceTest {
                     )
             );            assertEquals(EstadoSolicitud.CLASIFICADA, solicitud.getEstado());
 
+
             // CLASIFICADA → EN_ATENCION
             when(responsableRepository.findById(10L)).thenReturn(Optional.of(responsableActivo));
             solicitudService.asignarResponsable(1L, 10L);
@@ -810,6 +841,7 @@ class SolicitudServiceTest {
             assertEquals(EstadoSolicitud.CERRADA, solicitud.getEstado());
         }
 
+
         @Test
         @DisplayName("should_prohibirCierreDirecto_when_estadoRegistrada")
         void should_prohibirCierreDirecto_when_estadoRegistrada() {
@@ -823,13 +855,20 @@ class SolicitudServiceTest {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
+
+
     // helpers
-    // ─────────────────────────────────────────────────────────────────────────
+
+    // Este método fabrica objetos Solicitud listos para usar y así evitar
+    //  repetición de código
+
     private Solicitud buildSolicitud(Long id, EstadoSolicitud estado) {
         return Solicitud.builder().id(id).estado(estado)
                 .tipo(TipoSolicitud.CUPOS).estudiante(estudianteActivo).build();
     }
+
+    // Este método fabrica objetos Historial listos para usar y así evitar
+    //  repetición de código
 
     private Historial crearHistorial(Long id, String descripcion, LocalDateTime fecha) {
         Historial h = new Historial();
