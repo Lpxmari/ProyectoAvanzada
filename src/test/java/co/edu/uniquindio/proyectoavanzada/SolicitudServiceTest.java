@@ -44,12 +44,12 @@ class SolicitudServiceTest {
     @BeforeEach
     void setUp() {
         estudianteActivo = new Estudiante();
-        estudianteActivo.setId(1L);
+        estudianteActivo.setId(1204L);
         estudianteActivo.setNombreCompleto("Mariana Ramírez");
         estudianteActivo.setCorreo("mariana@uniquindio.edu.co");
 
         responsableActivo = new Responsable();
-        responsableActivo.setId(10L);
+        responsableActivo.setId(1010L);
         responsableActivo.setNombreCompleto("Prof. Martínez");
         responsableActivo.setActivo(true);
         responsableActivo.setDeleted(false);
@@ -66,14 +66,14 @@ class SolicitudServiceTest {
         void should_retornarSolicitudRegistrada_when_datosValidos() {
             CrearSolicitudDTO dto = new CrearSolicitudDTO(
                     "Necesito homologar Cálculo II",
-                    TipoSolicitud.HOMOLOGACION, "correo", 1L);
+                    TipoSolicitud.HOMOLOGACION, "correo", 1204L);
             Solicitud guardada = Solicitud.builder()
-                    .id(100L).descripcion(dto.descripcion())
+                    .id(1050L).descripcion(dto.descripcion())
                     .tipo(dto.tipoSolicitud()).estado(EstadoSolicitud.REGISTRADA)
                     .canalOrigen(dto.canalOrigen()).estudiante(estudianteActivo)
                     .fechaHoraRegistro(LocalDateTime.now()).build();
 
-            when(estudianteRepository.findById(1L)).thenReturn(Optional.of(estudianteActivo));
+            when(estudianteRepository.findById(1204L)).thenReturn(Optional.of(estudianteActivo));
             when(solicitudRepository.save(any(Solicitud.class))).thenReturn(guardada);
 
             Solicitud resultado = solicitudService.registrarSolicitud(dto);
@@ -89,10 +89,10 @@ class SolicitudServiceTest {
         @DisplayName("should_asignarFechaRegistro_when_solicitudCreada")
         void should_asignarFechaRegistro_when_solicitudCreada() {
             CrearSolicitudDTO dto = new CrearSolicitudDTO(
-                    "Solicitud de cupos", TipoSolicitud.CUPOS, "presencial", 1L);
+                    "Solicitud de cupos", TipoSolicitud.CUPOS, "presencial", 1204L);
             ArgumentCaptor<Solicitud> captor = ArgumentCaptor.forClass(Solicitud.class);
 
-            when(estudianteRepository.findById(1L)).thenReturn(Optional.of(estudianteActivo));
+            when(estudianteRepository.findById(1204L)).thenReturn(Optional.of(estudianteActivo));
             when(solicitudRepository.save(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
 
             solicitudService.registrarSolicitud(dto);
@@ -118,10 +118,10 @@ class SolicitudServiceTest {
         @DisplayName("should_guardarConEstadoRegistrada_when_nuevaSolicitud")
         void should_guardarConEstadoRegistrada_when_nuevaSolicitud() {
             CrearSolicitudDTO dto = new CrearSolicitudDTO(
-                    "desc", TipoSolicitud.HOMOLOGACION, "correo", 1L);
+                    "desc", TipoSolicitud.HOMOLOGACION, "correo", 1010L);
             ArgumentCaptor<Solicitud> captor = ArgumentCaptor.forClass(Solicitud.class);
 
-            when(estudianteRepository.findById(1L)).thenReturn(Optional.of(estudianteActivo));
+            when(estudianteRepository.findById(1010L)).thenReturn(Optional.of(estudianteActivo));
             when(solicitudRepository.save(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
 
             solicitudService.registrarSolicitud(dto);
@@ -143,10 +143,10 @@ class SolicitudServiceTest {
             Solicitud solicitud = Solicitud.builder()
                     .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1010L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            Solicitud resultado = solicitudService.realizarTriage(1L,
+            Solicitud resultado = solicitudService.realizarTriage(1010L,
                     new PrioridadDTO(
                             NivelSolicitud.ALTA,
                             "Urgente por fecha límite",
@@ -163,13 +163,13 @@ class SolicitudServiceTest {
         void should_asignarNivelDePrioridad_when_triageExitoso() {
 
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
+                    .id(1055L).estado(EstadoSolicitud.REGISTRADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1055L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
 
-            Solicitud resultado = solicitudService.realizarTriage(1L,
+            Solicitud resultado = solicitudService.realizarTriage(1055L,
                     new PrioridadDTO(NivelSolicitud.BAJA, "Bajo", "Sin urgencia", null)            );
 
             assertEquals(NivelSolicitud.BAJA, resultado.getPrioridad().getNivel());        }
@@ -179,14 +179,14 @@ class SolicitudServiceTest {
         @DisplayName("should_guardarSolicitudConEstadoClasificada_when_triageExitoso")
         void should_guardarSolicitudConEstadoClasificada_when_triageExitoso() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
+                    .id(1045L).estado(EstadoSolicitud.REGISTRADA).build();
             ArgumentCaptor<Solicitud> captor = ArgumentCaptor.forClass(Solicitud.class);
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
 
             solicitudService.realizarTriage(
-                    1L,
+                    1045L,
                     new PrioridadDTO(
                             NivelSolicitud.MEDIA,
                             "Revisión normal",
@@ -202,13 +202,13 @@ class SolicitudServiceTest {
         void should_registrarDescripcionEnPrioridad_when_triageConDescripcion() {
 
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
+                    .id(1045L).estado(EstadoSolicitud.REGISTRADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
 
-            Solicitud resultado = solicitudService.realizarTriage(1L,
+            Solicitud resultado = solicitudService.realizarTriage(1045L,
                     new PrioridadDTO(NivelSolicitud.BAJA, "Bajo", "Sin urgencia inmediata", null));
 
 
@@ -236,11 +236,11 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarIllegalState_when_solicitudYaClasificada")
         void should_lanzarIllegalState_when_solicitudYaClasificada() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(2L).estado(EstadoSolicitud.CLASIFICADA).build();
-            when(solicitudRepository.findById(2L)).thenReturn(Optional.of(solicitud));
+                    .id(2020L).estado(EstadoSolicitud.CLASIFICADA).build();
+            when(solicitudRepository.findById(2020L)).thenReturn(Optional.of(solicitud));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.realizarTriage(2L,
+                    () -> solicitudService.realizarTriage(2020L,
                             new PrioridadDTO(
                                     NivelSolicitud.BAJA,
                                     "Bajo impacto académico",
@@ -256,9 +256,9 @@ class SolicitudServiceTest {
         @DisplayName("should_registrarHistorial_when_triageExitoso")
         void should_registrarHistorial_when_triageExitoso() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
+                    .id(1224L).estado(EstadoSolicitud.REGISTRADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1224L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
             PrioridadDTO dto = new PrioridadDTO(
@@ -269,7 +269,7 @@ class SolicitudServiceTest {
             );
 
 
-            solicitudService.realizarTriage(1L, dto);
+            solicitudService.realizarTriage(1224L, dto);
 
             verify(historialRepository, atLeastOnce()).save(any(Historial.class));
         }
@@ -288,13 +288,13 @@ class SolicitudServiceTest {
         @DisplayName("should_cambiarEstadoAEnAtencion_when_responsableActivoAsignado")
         void should_cambiarEstadoAEnAtencion_when_responsableActivoAsignado() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CLASIFICADA).build();
+                    .id(1045L).estado(EstadoSolicitud.CLASIFICADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
-            when(responsableRepository.findById(10L)).thenReturn(Optional.of(responsableActivo));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
+            when(responsableRepository.findById(1010L)).thenReturn(Optional.of(responsableActivo));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            Solicitud resultado = solicitudService.asignarResponsable(1L, 10L);
+            Solicitud resultado = solicitudService.asignarResponsable(1045L, 1010L);
 
             assertEquals(EstadoSolicitud.EN_ATENCION, resultado.getEstado());
         }
@@ -303,16 +303,16 @@ class SolicitudServiceTest {
         @DisplayName("should_vincularResponsableEnSolicitud_when_asignacionExitosa")
         void should_vincularResponsableEnSolicitud_when_asignacionExitosa() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CLASIFICADA).build();
+                    .id(1045L).estado(EstadoSolicitud.CLASIFICADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
-            when(responsableRepository.findById(10L)).thenReturn(Optional.of(responsableActivo));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
+            when(responsableRepository.findById(1010L)).thenReturn(Optional.of(responsableActivo));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            Solicitud resultado = solicitudService.asignarResponsable(1L, 10L);
+            Solicitud resultado = solicitudService.asignarResponsable(1045L, 1010L);
 
             assertNotNull(resultado.getResponsableAsignado());
-            assertEquals(10L, resultado.getResponsableAsignado().getId());
+            assertEquals(1010L, resultado.getResponsableAsignado().getId());
             assertEquals("Prof. Martínez",
                     resultado.getResponsableAsignado().getNombreCompleto());
         }
@@ -322,13 +322,13 @@ class SolicitudServiceTest {
         @DisplayName("should_persistirCambios_when_asignacionExitosa")
         void should_persistirCambios_when_asignacionExitosa() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CLASIFICADA).build();
+                    .id(1045L).estado(EstadoSolicitud.CLASIFICADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
-            when(responsableRepository.findById(10L)).thenReturn(Optional.of(responsableActivo));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
+            when(responsableRepository.findById(1010L)).thenReturn(Optional.of(responsableActivo));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            solicitudService.asignarResponsable(1L, 10L);
+            solicitudService.asignarResponsable(1045L, 1010L);
 
             verify(solicitudRepository, times(1)).save(solicitud);
         }
@@ -338,15 +338,15 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarIllegalState_when_responsableInactivo")
         void should_lanzarIllegalState_when_responsableInactivo() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CLASIFICADA).build();
+                    .id(1045L).estado(EstadoSolicitud.CLASIFICADA).build();
             Responsable inactivo = new Responsable();
             inactivo.setActivo(false);
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
-            when(responsableRepository.findById(10L)).thenReturn(Optional.of(inactivo));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
+            when(responsableRepository.findById(1010L)).thenReturn(Optional.of(inactivo));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.asignarResponsable(1L, 10L));
+                    () -> solicitudService.asignarResponsable(1045L, 1010L));
             verify(solicitudRepository, never()).save(any());
         }
 
@@ -354,13 +354,13 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarIllegalState_when_solicitudNoClasificada")
         void should_lanzarIllegalState_when_solicitudNoClasificada() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
+                    .id(1045L).estado(EstadoSolicitud.REGISTRADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
-            when(responsableRepository.findById(10L)).thenReturn(Optional.of(responsableActivo));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
+            when(responsableRepository.findById(1010L)).thenReturn(Optional.of(responsableActivo));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.asignarResponsable(1L, 10L));
+                    () -> solicitudService.asignarResponsable(1045L, 1010L));
         }
 
 
@@ -368,13 +368,13 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarRecursoNoEncontrado_when_responsableInexistente")
         void should_lanzarRecursoNoEncontrado_when_responsableInexistente() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CLASIFICADA).build();
+                    .id(1045L).estado(EstadoSolicitud.CLASIFICADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
-            when(responsableRepository.findById(99L)).thenReturn(Optional.empty());
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
+            when(responsableRepository.findById(1010L)).thenReturn(Optional.empty());
 
             assertThrows(RecursoNoEncontradoException.class,
-                    () -> solicitudService.asignarResponsable(1L, 99L));
+                    () -> solicitudService.asignarResponsable(1045L, 1010L));
         }
 
 
@@ -382,13 +382,13 @@ class SolicitudServiceTest {
         @DisplayName("should_registrarHistorial_when_asignacionExitosa")
         void should_registrarHistorial_when_asignacionExitosa() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CLASIFICADA).build();
+                    .id(1045L).estado(EstadoSolicitud.CLASIFICADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
-            when(responsableRepository.findById(10L)).thenReturn(Optional.of(responsableActivo));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
+            when(responsableRepository.findById(1010L)).thenReturn(Optional.of(responsableActivo));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            solicitudService.asignarResponsable(1L, 10L);
+            solicitudService.asignarResponsable(1045L, 1010L);
 
             verify(historialRepository, atLeastOnce()).save(any(Historial.class));
         }
@@ -406,12 +406,12 @@ class SolicitudServiceTest {
         @DisplayName("should_cambiarEstadoAAtendida_when_solicitudEnAtencion")
         void should_cambiarEstadoAAtendida_when_solicitudEnAtencion() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.EN_ATENCION).build();
+                    .id(1045L).estado(EstadoSolicitud.EN_ATENCION).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            Solicitud resultado = solicitudService.marcarComoAtendida(1L, "Resuelto");
+            Solicitud resultado = solicitudService.marcarComoAtendida(1045L, "Resuelto");
 
             assertEquals(EstadoSolicitud.ATENDIDA, resultado.getEstado());
         }
@@ -420,45 +420,45 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarIllegalState_when_solicitudNoEnAtencion")
         void should_lanzarIllegalState_when_solicitudNoEnAtencion() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+                    .id(1045L).estado(EstadoSolicitud.REGISTRADA).build();
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.marcarComoAtendida(1L, "obs"));
+                    () -> solicitudService.marcarComoAtendida(1045L, "obs"));
         }
 
         @Test
         @DisplayName("should_lanzarIllegalState_when_solicitudYaCerrada")
         void should_lanzarIllegalState_when_solicitudYaCerrada() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CERRADA).build();
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+                    .id(1045L).estado(EstadoSolicitud.CERRADA).build();
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.marcarComoAtendida(1L, "obs"));
+                    () -> solicitudService.marcarComoAtendida(1045L, "obs"));
         }
 
         @Test
         @DisplayName("should_lanzarIllegalState_when_solicitudClasificada")
         void should_lanzarIllegalState_when_solicitudClasificada() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CLASIFICADA).build();
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+                    .id(1045L).estado(EstadoSolicitud.CLASIFICADA).build();
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.marcarComoAtendida(1L, "obs"));
+                    () -> solicitudService.marcarComoAtendida(1045L, "obs"));
         }
 
         @Test
         @DisplayName("should_registrarHistorial_when_marcadaAtendida")
         void should_registrarHistorial_when_marcadaAtendida() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.EN_ATENCION).build();
+                    .id(1045L).estado(EstadoSolicitud.EN_ATENCION).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            solicitudService.marcarComoAtendida(1L, "Respuesta enviada");
+            solicitudService.marcarComoAtendida(1045L, "Respuesta enviada");
 
             verify(historialRepository, atLeastOnce()).save(any(Historial.class));
         }
@@ -485,12 +485,12 @@ class SolicitudServiceTest {
         @DisplayName("should_cambiarEstadoACerrada_when_solicitudAtendida")
         void should_cambiarEstadoACerrada_when_solicitudAtendida() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.ATENDIDA).build();
+                    .id(1045L).estado(EstadoSolicitud.ATENDIDA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            solicitudService.cerrarSolicitud(1L, new CierreDTO(null, "Todo resuelto", null));
+            solicitudService.cerrarSolicitud(1045L, new CierreDTO(null, "Todo resuelto", null));
 
             assertEquals(EstadoSolicitud.CERRADA, solicitud.getEstado());
             assertNotNull(solicitud.getFechaCierre());
@@ -500,13 +500,13 @@ class SolicitudServiceTest {
         @DisplayName("should_asignarFechaCierre_when_solicitudCerradaExitosamente")
         void should_asignarFechaCierre_when_solicitudCerradaExitosamente() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.ATENDIDA).build();
+                    .id(1045L).estado(EstadoSolicitud.ATENDIDA).build();
             LocalDateTime antes = LocalDateTime.now().minusSeconds(1);
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            solicitudService.cerrarSolicitud(1L, new CierreDTO(null, "obs", null));
+            solicitudService.cerrarSolicitud(1045L, new CierreDTO(null, "obs", null));
 
             assertThat(solicitud.getFechaCierre()).isAfter(antes);
         }
@@ -516,11 +516,11 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarIllegalState_when_solicitudRegistrada")
         void should_lanzarIllegalState_when_solicitudRegistrada() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+                    .id(1045L).estado(EstadoSolicitud.REGISTRADA).build();
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.cerrarSolicitud(1L,
+                    () -> solicitudService.cerrarSolicitud(1045L,
                             new CierreDTO(null, "obs", null)));
         }
 
@@ -529,11 +529,11 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarIllegalState_when_solicitudEnAtencion")
         void should_lanzarIllegalState_when_solicitudEnAtencion() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.EN_ATENCION).build();
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+                    .id(1045L).estado(EstadoSolicitud.EN_ATENCION).build();
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.cerrarSolicitud(1L,
+                    () -> solicitudService.cerrarSolicitud(1045L,
                             new CierreDTO(null, "obs", null)));
         }
 
@@ -542,11 +542,11 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarIllegalState_when_solicitudClasificada")
         void should_lanzarIllegalState_when_solicitudClasificada() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.CLASIFICADA).build();
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+                    .id(1045L).estado(EstadoSolicitud.CLASIFICADA).build();
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.cerrarSolicitud(1L,
+                    () -> solicitudService.cerrarSolicitud(1045L,
                             new CierreDTO(null, "obs", null)));
         }
 
@@ -554,10 +554,10 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_lanzarRecursoNoEncontrado_when_idInexistente")
         void should_lanzarRecursoNoEncontrado_when_idInexistente() {
-            when(solicitudRepository.findById(404L)).thenReturn(Optional.empty());
+            when(solicitudRepository.findById(4040L)).thenReturn(Optional.empty());
 
             assertThrows(RecursoNoEncontradoException.class,
-                    () -> solicitudService.cerrarSolicitud(404L,
+                    () -> solicitudService.cerrarSolicitud(4040L,
                             new CierreDTO(null, "obs", null)));
         }
 
@@ -568,10 +568,10 @@ class SolicitudServiceTest {
             Solicitud solicitud = Solicitud.builder()
                     .id(1L).estado(EstadoSolicitud.ATENDIDA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            solicitudService.cerrarSolicitud(1L, new CierreDTO(null, "obs", null));
+            solicitudService.cerrarSolicitud(1045L, new CierreDTO(null, "obs", null));
 
             verify(historialRepository, atLeastOnce()).save(any(Historial.class));
         }
@@ -589,16 +589,16 @@ class SolicitudServiceTest {
         @DisplayName("should_retornarDTO_when_idExistente")
         void should_retornarDTO_when_idExistente() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).descripcion("Homologación")
+                    .id(1045L).descripcion("Homologación")
                     .estado(EstadoSolicitud.REGISTRADA)
                     .tipo(TipoSolicitud.HOMOLOGACION)
                     .estudiante(estudianteActivo).build();
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1045L)).thenReturn(Optional.of(solicitud));
 
-            SolicitudDTO resultado = solicitudService.obtenerPorId(1L);
+            SolicitudDTO resultado = solicitudService.obtenerPorId(1045L);
 
             assertNotNull(resultado);
-            assertEquals(1L, resultado.id());
+            assertEquals(1045L, resultado.id());
         }
 
 
@@ -627,9 +627,9 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_retornarTresSolicitudes_when_hayTresRegistros")
         void should_retornarTresSolicitudes_when_hayTresRegistros() {
-            Solicitud s1 = buildSolicitud(1L, EstadoSolicitud.REGISTRADA);
-            Solicitud s2 = buildSolicitud(2L, EstadoSolicitud.CLASIFICADA);
-            Solicitud s3 = buildSolicitud(3L, EstadoSolicitud.EN_ATENCION);
+            Solicitud s1 = buildSolicitud(1111L, EstadoSolicitud.REGISTRADA);
+            Solicitud s2 = buildSolicitud(2222L, EstadoSolicitud.CLASIFICADA);
+            Solicitud s3 = buildSolicitud(3333L, EstadoSolicitud.EN_ATENCION);
 
             when(solicitudRepository.findAll()).thenReturn(List.of(s1, s2, s3));
 
@@ -640,8 +640,8 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_incluirTodosLosEstados_when_listarTodas")
         void should_incluirTodosLosEstados_when_listarTodas() {
-            Solicitud s1 = buildSolicitud(1L, EstadoSolicitud.REGISTRADA);
-            Solicitud s2 = buildSolicitud(2L, EstadoSolicitud.CERRADA);
+            Solicitud s1 = buildSolicitud(1111L, EstadoSolicitud.REGISTRADA);
+            Solicitud s2 = buildSolicitud(2222L, EstadoSolicitud.CERRADA);
             when(solicitudRepository.findAll()).thenReturn(List.of(s1, s2));
 
             assertEquals(2, solicitudService.listarTodas().size());
@@ -651,10 +651,10 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_mapearIdCorrectamente_when_listarTodas")
         void should_mapearIdCorrectamente_when_listarTodas() {
-            Solicitud s = buildSolicitud(42L, EstadoSolicitud.REGISTRADA);
+            Solicitud s = buildSolicitud(1042L, EstadoSolicitud.REGISTRADA);
             when(solicitudRepository.findAll()).thenReturn(List.of(s));
 
-            assertEquals(42L, solicitudService.listarTodas().get(0).id());
+            assertEquals(1042L, solicitudService.listarTodas().get(0).id());
         }
 
 
@@ -663,8 +663,8 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_retornarSoloRegistradas_when_filtroRegistrada")
         void should_retornarSoloRegistradas_when_filtroRegistrada() {
-            Solicitud s1 = buildSolicitud(1L, EstadoSolicitud.REGISTRADA);
-            Solicitud s2 = buildSolicitud(2L, EstadoSolicitud.REGISTRADA);
+            Solicitud s1 = buildSolicitud(1111L, EstadoSolicitud.REGISTRADA);
+            Solicitud s2 = buildSolicitud(2222L, EstadoSolicitud.REGISTRADA);
             when(solicitudRepository.findByEstado(EstadoSolicitud.REGISTRADA))
                     .thenReturn(List.of(s1, s2));
 
@@ -680,7 +680,7 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_retornarSoloEnAtencion_when_filtroEnAtencion")
         void should_retornarSoloEnAtencion_when_filtroEnAtencion() {
-            Solicitud s = buildSolicitud(1L, EstadoSolicitud.EN_ATENCION);
+            Solicitud s = buildSolicitud(1010L, EstadoSolicitud.EN_ATENCION);
             when(solicitudRepository.findByEstado(EstadoSolicitud.EN_ATENCION))
                     .thenReturn(List.of(s));
 
@@ -705,7 +705,7 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_noMezclarEstados_when_filtrarPorClasificada")
         void should_noMezclarEstados_when_filtrarPorClasificada() {
-            Solicitud s = buildSolicitud(1L, EstadoSolicitud.CLASIFICADA);
+            Solicitud s = buildSolicitud(1010L, EstadoSolicitud.CLASIFICADA);
             when(solicitudRepository.findByEstado(EstadoSolicitud.CLASIFICADA))
                     .thenReturn(List.of(s));
 
@@ -723,16 +723,16 @@ class SolicitudServiceTest {
         @Test
         @DisplayName("should_retornarHistorialOrdenado_when_solicitudConVariosCambios")
         void should_retornarHistorialOrdenado_when_solicitudConVariosCambios() {
-            Historial h1 = crearHistorial(1L, "Solicitud REGISTRADA",
+            Historial h1 = crearHistorial(1010L, "Solicitud REGISTRADA",
                     LocalDateTime.now().minusDays(3));
-            Historial h2 = crearHistorial(2L, "Triage: prioridad ALTA",
+            Historial h2 = crearHistorial(2020L, "Triage: prioridad ALTA",
                     LocalDateTime.now().minusDays(2));
-            Historial h3 = crearHistorial(3L, "Responsable asignado",
+            Historial h3 = crearHistorial(3030L, "Responsable asignado",
                     LocalDateTime.now().minusDays(1));
 
-            when(historialRepository.findBySolicitudIdOrderByFechaHoraDesc(10L))                    .thenReturn(List.of(h1, h2, h3));
+            when(historialRepository.findBySolicitudIdOrderByFechaHoraDesc(1010L))                    .thenReturn(List.of(h1, h2, h3));
 
-            List<HistorialDTO> resultado = solicitudService.obtenerHistorial(10L);
+            List<HistorialDTO> resultado = solicitudService.obtenerHistorial(1010L);
 
             assertEquals(3, resultado.size());
             assertEquals("Solicitud REGISTRADA",   resultado.get(0).observaciones());
@@ -754,47 +754,47 @@ class SolicitudServiceTest {
         @DisplayName("should_mapearFechaEnHistorial_when_obtenerHistorial")
         void should_mapearFechaEnHistorial_when_obtenerHistorial() {
             LocalDateTime fechaEsperada = LocalDateTime.of(2025, 4, 13, 10, 30);
-            Historial h = crearHistorial(1L, "Estado cambiado", fechaEsperada);
-            when(historialRepository.findBySolicitudIdOrderByFechaHoraDesc(1L))
+            Historial h = crearHistorial(1010L, "Estado cambiado", fechaEsperada);
+            when(historialRepository.findBySolicitudIdOrderByFechaHoraDesc(1010L))
                     .thenReturn(List.of(h));
             assertEquals(fechaEsperada,
-                    solicitudService.obtenerHistorial(1L).get(0).fechaHora());
+                    solicitudService.obtenerHistorial(1010L).get(0).fechaHora());
         }
 
 
         @Test
         @DisplayName("should_mapearDescripcionEnHistorial_when_obtenerHistorial")
         void should_mapearDescripcionEnHistorial_when_obtenerHistorial() {
-            Historial h = crearHistorial(1L, "Solicitud cerrada por coordinador",
+            Historial h = crearHistorial(1010L, "Solicitud cerrada por coordinador",
                     LocalDateTime.now());
-            when(historialRepository.findBySolicitudIdOrderByFechaHoraDesc(1L))
+            when(historialRepository.findBySolicitudIdOrderByFechaHoraDesc(1010L))
                     .thenReturn(List.of(h));
             assertEquals("Solicitud cerrada por coordinador",
-                    solicitudService.obtenerHistorial(1L).get(0).observaciones());
+                    solicitudService.obtenerHistorial(1010L).get(0).observaciones());
         }
 
 
         @Test
         @DisplayName("should_listarPorEstudiante_when_estudianteConSolicitudes")
         void should_listarPorEstudiante_when_estudianteConSolicitudes() {
-            Solicitud s = buildSolicitud(1L, EstadoSolicitud.REGISTRADA);
-            when(solicitudRepository.findByEstudianteId(1L)).thenReturn(List.of(s));
+            Solicitud s = buildSolicitud(1010L, EstadoSolicitud.REGISTRADA);
+            when(solicitudRepository.findByEstudianteId(1010L)).thenReturn(List.of(s));
 
-            assertEquals(1, solicitudService.listarPorEstudiante(1L).size());
+            assertEquals(1, solicitudService.listarPorEstudiante(1010L).size());
         }
 
 
         @Test
         @DisplayName("should_listarPorResponsable_when_responsableConSolicitudes")
         void should_listarPorResponsable_when_responsableConSolicitudes() {
-            Solicitud s = Solicitud.builder().id(1L)
+            Solicitud s = Solicitud.builder().id(1010L)
                     .estado(EstadoSolicitud.EN_ATENCION)
                     .tipo(TipoSolicitud.CUPOS)
                     .estudiante(estudianteActivo)
                     .responsableAsignado(responsableActivo).build();
-            when(solicitudRepository.findByResponsableAsignadoId(10L)).thenReturn(List.of(s));
+            when(solicitudRepository.findByResponsableAsignadoId(1010L)).thenReturn(List.of(s));
 
-            assertEquals(1, solicitudService.listarPorResponsable(10L).size());
+            assertEquals(1, solicitudService.listarPorResponsable(1010L).size());
         }
     }
 
@@ -810,14 +810,14 @@ class SolicitudServiceTest {
         @DisplayName("should_seguirFlujoCompleto_REGISTRADA_a_CERRADA")
         void should_seguirFlujoCompleto_REGISTRADA_a_CERRADA() {
             Solicitud solicitud = Solicitud.builder()
-                    .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
+                    .id(1010L).estado(EstadoSolicitud.REGISTRADA).build();
 
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1010L)).thenReturn(Optional.of(solicitud));
             when(solicitudRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
             // REGISTRADA → CLASIFICADA
             solicitudService.realizarTriage(
-                    1L,
+                    1010L,
                     new PrioridadDTO(
                             NivelSolicitud.ALTA,
                             "Alto impacto académico",
@@ -828,16 +828,16 @@ class SolicitudServiceTest {
 
 
             // CLASIFICADA → EN_ATENCION
-            when(responsableRepository.findById(10L)).thenReturn(Optional.of(responsableActivo));
-            solicitudService.asignarResponsable(1L, 10L);
+            when(responsableRepository.findById(1010L)).thenReturn(Optional.of(responsableActivo));
+            solicitudService.asignarResponsable(1010L, 1010L);
             assertEquals(EstadoSolicitud.EN_ATENCION, solicitud.getEstado());
 
             // EN_ATENCION → ATENDIDA
-            solicitudService.marcarComoAtendida(1L, "Resuelto");
+            solicitudService.marcarComoAtendida(1010L, "Resuelto");
             assertEquals(EstadoSolicitud.ATENDIDA, solicitud.getEstado());
 
             // ATENDIDA → CERRADA
-            solicitudService.cerrarSolicitud(1L, new CierreDTO(null, "Finalizado", null));
+            solicitudService.cerrarSolicitud(1010L, new CierreDTO(null, "Finalizado", null));
             assertEquals(EstadoSolicitud.CERRADA, solicitud.getEstado());
         }
 
@@ -847,10 +847,10 @@ class SolicitudServiceTest {
         void should_prohibirCierreDirecto_when_estadoRegistrada() {
             Solicitud solicitud = Solicitud.builder()
                     .id(1L).estado(EstadoSolicitud.REGISTRADA).build();
-            when(solicitudRepository.findById(1L)).thenReturn(Optional.of(solicitud));
+            when(solicitudRepository.findById(1010L)).thenReturn(Optional.of(solicitud));
 
             assertThrows(IllegalStateException.class,
-                    () -> solicitudService.cerrarSolicitud(1L,
+                    () -> solicitudService.cerrarSolicitud(1010L,
                             new CierreDTO(null, "obs", null)));
         }
     }

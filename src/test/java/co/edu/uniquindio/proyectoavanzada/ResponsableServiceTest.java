@@ -41,14 +41,14 @@ class ResponsableServiceTest {
 
     @BeforeEach
     void setUp() {
-        responsableActivo = crearResponsable(1L, "Prof. Pedro Martínez",
+        responsableActivo = crearResponsable(1204L, "Prof. Pedro Martínez",
                 "Coordinador Académico", true, false);
         responsableActivo.setPassword("passwordPlano");
 
-        responsableInactivo = crearResponsable(2L, "Prof. Inactivo",
+        responsableInactivo = crearResponsable(2806L, "Prof. Inactivo",
                 "Asesor", false, false);
 
-        responsableBorrado = crearResponsable(3L, "Borrado Lógico",
+        responsableBorrado = crearResponsable(1306L, "Borrado Lógico",
                 "Docente", true, true);
     }
 
@@ -63,7 +63,7 @@ class ResponsableServiceTest {
         @Test
         @DisplayName("should_retornarDosResponsables_when_hayDosActivosYUnoInactivo")
         void should_retornarDosResponsables_when_hayDosActivosYUnoInactivo() {
-            Responsable activo2 = crearResponsable(4L, "Prof. Florez",
+            Responsable activo2 = crearResponsable(1204L, "Prof. Florez",
                     "Asesor", true, false);
             when(responsableRepository.findAll())
                     .thenReturn(List.of(responsableActivo, activo2, responsableInactivo));
@@ -135,7 +135,7 @@ class ResponsableServiceTest {
             ResponsableDTO resultado = responsableService.crearResponsable(responsableActivo);
 
             assertNotNull(resultado);
-            assertEquals(1L,                     resultado.id());
+            assertEquals(1204L,                     resultado.id());
             assertEquals("Prof. Pedro Martínez", resultado.nombreCompleto());
             assertEquals("Coordinador Académico",resultado.cargo());
         }
@@ -169,7 +169,7 @@ class ResponsableServiceTest {
             ResponsableDTO resultado = responsableService.obtenerPorId(1L);
 
             assertAll(
-                    () -> assertEquals(1L,                     resultado.id()),
+                    () -> assertEquals(1204L,                     resultado.id()),
                     () -> assertEquals("Prof. Pedro Martínez", resultado.nombreCompleto()),
                     () -> assertTrue(resultado.activo())
             );
@@ -187,11 +187,11 @@ class ResponsableServiceTest {
         @Test
         @DisplayName("should_lanzarRecursoNoEncontrado_when_responsableBorradoLogicamente")
         void should_lanzarRecursoNoEncontrado_when_responsableBorradoLogicamente() {
-            when(responsableRepository.findById(3L))
+            when(responsableRepository.findById(1306L))
                     .thenReturn(Optional.of(responsableBorrado));
 
             assertThrows(RecursoNoEncontradoException.class,
-                    () -> responsableService.obtenerPorId(3L));
+                    () -> responsableService.obtenerPorId(1306L));
         }
     }
 
@@ -211,12 +211,12 @@ class ResponsableServiceTest {
             datosNuevos.setCargo("Director de Programa");
             datosNuevos.setActivo(true);
 
-            when(responsableRepository.findById(1L))
+            when(responsableRepository.findById(1204L))
                     .thenReturn(Optional.of(responsableActivo));
             when(responsableRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
             ResponsableDTO resultado =
-                    responsableService.actualizarResponsable(1L, datosNuevos);
+                    responsableService.actualizarResponsable(1204L, datosNuevos);
 
             assertAll(
                     () -> assertEquals("Prof. P. Martínez Actualizado", resultado.nombreCompleto()),
@@ -233,12 +233,12 @@ class ResponsableServiceTest {
             datosNuevos.setCargo("Coordinador");
             datosNuevos.setActivo(false);
 
-            when(responsableRepository.findById(1L))
+            when(responsableRepository.findById(1204L))
                     .thenReturn(Optional.of(responsableActivo));
             when(responsableRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
             ResponsableDTO resultado =
-                    responsableService.actualizarResponsable(1L, datosNuevos);
+                    responsableService.actualizarResponsable(1204L, datosNuevos);
 
             assertFalse(resultado.activo());
         }
@@ -251,12 +251,12 @@ class ResponsableServiceTest {
             datosNuevos.setCargo("Nuevo cargo");
             datosNuevos.setActivo(true);
 
-            when(responsableRepository.findById(1L))
+            when(responsableRepository.findById(1204L))
                     .thenReturn(Optional.of(responsableActivo));
             when(responsableRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            assertEquals(1L,
-                    responsableService.actualizarResponsable(1L, datosNuevos).id());
+            assertEquals(1204L,
+                    responsableService.actualizarResponsable(1204L, datosNuevos).id());
         }
 
         @Test
@@ -281,11 +281,11 @@ class ResponsableServiceTest {
         @DisplayName("should_marcarComoDeleted_when_eliminarResponsable")
         void should_marcarComoDeleted_when_eliminarResponsable() {
             ArgumentCaptor<Responsable> captor = ArgumentCaptor.forClass(Responsable.class);
-            when(responsableRepository.findById(1L))
+            when(responsableRepository.findById(1204L))
                     .thenReturn(Optional.of(responsableActivo));
             when(responsableRepository.save(captor.capture())).thenReturn(responsableActivo);
 
-            responsableService.eliminarResponsable(1L);
+            responsableService.eliminarResponsable(1204L);
 
             assertTrue(captor.getValue().isDeleted());
             verify(responsableRepository, never()).deleteById(any());
@@ -297,11 +297,11 @@ class ResponsableServiceTest {
             ArgumentCaptor<Responsable> captor = ArgumentCaptor.forClass(Responsable.class);
             LocalDateTime antes = LocalDateTime.now().minusSeconds(1);
 
-            when(responsableRepository.findById(1L))
+            when(responsableRepository.findById(1204L))
                     .thenReturn(Optional.of(responsableActivo));
             when(responsableRepository.save(captor.capture())).thenReturn(responsableActivo);
 
-            responsableService.eliminarResponsable(1L);
+            responsableService.eliminarResponsable(1204L);
 
             assertNotNull(captor.getValue().getDeletedAt());
             assertThat(captor.getValue().getDeletedAt()).isAfter(antes);

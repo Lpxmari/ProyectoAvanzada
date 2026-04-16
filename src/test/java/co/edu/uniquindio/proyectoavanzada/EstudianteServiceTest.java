@@ -44,7 +44,7 @@ class EstudianteServiceTest {
     @BeforeEach
     void setUp() {
         estudianteExistente = new Estudiante();
-        estudianteExistente.setId(1L);
+        estudianteExistente.setId(3456L);
         estudianteExistente.setNombreCompleto("Mariana Ramírez");
         estudianteExistente.setCorreo("mariana@uniquindio.edu.co");
         estudianteExistente.setPrograma(ProgramaAcademico.ING_SISTEMAS);
@@ -57,7 +57,7 @@ class EstudianteServiceTest {
                 ProgramaAcademico.ING_SISTEMAS
         );
 
-        actualizarDTO = new EstudianteDTO(1L,
+        actualizarDTO = new EstudianteDTO(3456L,
                 "Valentina N. Actualizada",
                 "valentina.nueva@uniquindio.edu.co",
                 ProgramaAcademico.MEDICINA);
@@ -75,11 +75,11 @@ class EstudianteServiceTest {
         @DisplayName("should_retornarId_when_datosValidos")
         void should_retornarId_when_datosValidos() {
             Estudiante guardado = new Estudiante();
-            guardado.setId(5L);
+            guardado.setId(5555L);
             when(passwordEncoder.encode("pass1234")).thenReturn("hashedPass");
             when(estudianteRepository.save(any())).thenReturn(guardado);
 
-            assertEquals(5L, estudianteService.crearEstudiante(crearDTO));
+            assertEquals(5555L, estudianteService.crearEstudiante(crearDTO));
             verify(estudianteRepository, times(1)).save(any());
         }
 
@@ -88,7 +88,7 @@ class EstudianteServiceTest {
         void should_cifrarPassword_when_crearEstudiante() {
             ArgumentCaptor<Estudiante> captor = ArgumentCaptor.forClass(Estudiante.class);
             Estudiante guardado = new Estudiante();
-            guardado.setId(1L);
+            guardado.setId(3456L);
 
             when(passwordEncoder.encode("pass1234")).thenReturn("$2a$10$hashedValue");
             when(estudianteRepository.save(captor.capture())).thenReturn(guardado);
@@ -105,7 +105,7 @@ class EstudianteServiceTest {
         void should_mapearCamposCorrectamente_when_crearEstudiante() {
             ArgumentCaptor<Estudiante> captor = ArgumentCaptor.forClass(Estudiante.class);
             Estudiante guardado = new Estudiante();
-            guardado.setId(3L);
+            guardado.setId(1234L);
             when(passwordEncoder.encode(anyString())).thenReturn("hashed");
             when(estudianteRepository.save(captor.capture())).thenReturn(guardado);
 
@@ -133,16 +133,16 @@ class EstudianteServiceTest {
         @Test
         @DisplayName("should_actualizarNombreCorreo_when_datosNuevosValidos")
         void should_actualizarNombreCorreo_when_datosNuevosValidos() {
-            EstudianteDTO nuevos = new EstudianteDTO(1L,
+            EstudianteDTO nuevos = new EstudianteDTO(3456L,
                     "Mariana Ramírez Colorado",
                     "mariana.colorado@uniquindio.edu.co",
                     ProgramaAcademico.ING_SISTEMAS);
 
-            when(estudianteRepository.findById(1L))
+            when(estudianteRepository.findById(3456L))
                     .thenReturn(Optional.of(estudianteExistente));
             when(estudianteRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            estudianteService.actualizarEstudiante(1L, nuevos);
+            estudianteService.actualizarEstudiante(3456L, nuevos);
 
             assertAll(
                     () -> assertEquals("Mariana Ramírez Colorado",
@@ -155,16 +155,16 @@ class EstudianteServiceTest {
         @Test
         @DisplayName("should_cambiarPrograma_when_estudianteCambiaCarrera")
         void should_cambiarPrograma_when_estudianteCambiaCarrera() {
-            EstudianteDTO nuevos = new EstudianteDTO(1L,
+            EstudianteDTO nuevos = new EstudianteDTO(3456L,
                     "Mariana Ramírez",
                     "mariana@uniquindio.edu.co",
                     ProgramaAcademico.MEDICINA);
 
-            when(estudianteRepository.findById(1L))
+            when(estudianteRepository.findById(3456L))
                     .thenReturn(Optional.of(estudianteExistente));
             when(estudianteRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            estudianteService.actualizarEstudiante(1L, nuevos);
+            estudianteService.actualizarEstudiante(3456L, nuevos);
 
             assertEquals(ProgramaAcademico.MEDICINA, estudianteExistente.getPrograma());
         }
@@ -194,11 +194,11 @@ class EstudianteServiceTest {
         @Test
         @DisplayName("should_noActualizarPassword_when_actualizarEstudiante")
         void should_noActualizarPassword_when_actualizarEstudiante() {
-            when(estudianteRepository.findById(1L))
+            when(estudianteRepository.findById(1234L))
                     .thenReturn(Optional.of(estudianteExistente));
             when(estudianteRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            estudianteService.actualizarEstudiante(1L, actualizarDTO);
+            estudianteService.actualizarEstudiante(1234L, actualizarDTO);
 
             verifyNoInteractions(passwordEncoder);
         }
@@ -215,11 +215,11 @@ class EstudianteServiceTest {
         @Test
         @DisplayName("should_eliminarEstudiante_when_idExistente")
         void should_eliminarEstudiante_when_idExistente() {
-            when(estudianteRepository.existsById(1L)).thenReturn(true);
+            when(estudianteRepository.existsById(1234L)).thenReturn(true);
 
-            estudianteService.eliminarEstudiante(1L);
+            estudianteService.eliminarEstudiante(1234L);
 
-            verify(estudianteRepository, times(1)).deleteById(1L);
+            verify(estudianteRepository, times(1)).deleteById(1234L);
         }
 
         @Test
@@ -264,11 +264,11 @@ class EstudianteServiceTest {
         @Test
         @DisplayName("should_lanzarRecursoNoEncontrado_when_idInexistenteEnObtener")
         void should_lanzarRecursoNoEncontrado_when_idInexistenteEnObtener() {
-            when(estudianteRepository.findById(404L)).thenReturn(Optional.empty());
+            when(estudianteRepository.findById(4049L)).thenReturn(Optional.empty());
 
             RecursoNoEncontradoException ex = assertThrows(
                     RecursoNoEncontradoException.class,
-                    () -> estudianteService.obtenerEstudiante(404L));
+                    () -> estudianteService.obtenerEstudiante(4049L));
             assertThat(ex.getMessage()).containsIgnoringCase("estudiante");
         }
     }
@@ -292,11 +292,11 @@ class EstudianteServiceTest {
         @Test
         @DisplayName("should_retornarListaConTresEstudiantes_when_hayTresRegistros")
         void should_retornarListaConTresEstudiantes_when_hayTresRegistros() {
-            Estudiante e1 = crearEstudiante(1L, "Mariana Ramírez",
+            Estudiante e1 = crearEstudiante(3456L, "Mariana Ramírez",
                     "mariana@uniquindio.edu.co",   ProgramaAcademico.ING_SISTEMAS);
-            Estudiante e2 = crearEstudiante(2L, "Yamileth Londoño",
+            Estudiante e2 = crearEstudiante(1234L, "Yamileth Londoño",
                     "jhaineth@uniquindio.edu.co",  ProgramaAcademico.ING_SISTEMAS);
-            Estudiante e3 = crearEstudiante(3L, "Andrés Ospina",
+            Estudiante e3 = crearEstudiante(7891L, "Andrés Ospina",
                     "andres@uniquindio.edu.co",    ProgramaAcademico.MEDICINA);
 
             when(estudianteRepository.findAll()).thenReturn(List.of(e1, e2, e3));
@@ -315,7 +315,7 @@ class EstudianteServiceTest {
         @Test
         @DisplayName("should_mapearProgramaAcademico_when_listarEstudiantes")
         void should_mapearProgramaAcademico_when_listarEstudiantes() {
-            Estudiante e = crearEstudiante(2L, "Yamileth Londoño",
+            Estudiante e = crearEstudiante(1234L, "Yamileth Londoño",
                     "yamileth@uniquindio.edu.co", ProgramaAcademico.MEDICINA);
             when(estudianteRepository.findAll()).thenReturn(List.of(e));
 

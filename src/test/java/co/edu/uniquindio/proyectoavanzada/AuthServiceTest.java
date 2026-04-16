@@ -42,7 +42,7 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         usuarioActivo = new Estudiante();
-        usuarioActivo.setId(1L);
+        usuarioActivo.setId(3456L);
         usuarioActivo.setUsername("mariana.ramirez");
         usuarioActivo.setPassword("$2a$10$hashedPassword");
         usuarioActivo.setActivo(true);
