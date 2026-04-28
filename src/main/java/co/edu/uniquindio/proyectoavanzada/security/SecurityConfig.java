@@ -59,6 +59,9 @@ public class SecurityConfig {
                         // RESPONSABLE y ADMIN pueden ver solicitudes e historial (GET general al final)
                         .requestMatchers(HttpMethod.GET, "/api/solicitudes/**").hasAnyRole("RESPONSABLE", "ADMIN")
 
+                        // IA disponible para admi y responsable
+                        .requestMatchers("/api/ia/**").hasAnyRole("ADMIN" , "RESPONSABLE")
+
                         // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
                 )
