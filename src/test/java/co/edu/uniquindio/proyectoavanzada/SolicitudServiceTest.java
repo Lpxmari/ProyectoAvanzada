@@ -89,7 +89,7 @@ class SolicitudServiceTest {
         @DisplayName("should_asignarFechaRegistro_when_solicitudCreada")
         void should_asignarFechaRegistro_when_solicitudCreada() {
             CrearSolicitudDTO dto = new CrearSolicitudDTO(
-                    "Solicitud de cupos", TipoSolicitud.CUPOS, "presencial", 1L);
+                    "Solicitud de cupos", TipoSolicitud.SOLICITUD_CUPOS, "presencial", 1L);
             ArgumentCaptor<Solicitud> captor = ArgumentCaptor.forClass(Solicitud.class);
 
             when(estudianteRepository.findById(1L)).thenReturn(Optional.of(estudianteActivo));
@@ -106,7 +106,7 @@ class SolicitudServiceTest {
         @DisplayName("should_lanzarRecursoNoEncontrado_when_estudianteInexistente")
         void should_lanzarRecursoNoEncontrado_when_estudianteInexistente() {
             CrearSolicitudDTO dto = new CrearSolicitudDTO(
-                    "desc", TipoSolicitud.CUPOS, "web", 999L);
+                    "desc", TipoSolicitud.SOLICITUD_CUPOS, "web", 999L);
             when(estudianteRepository.findById(999L)).thenReturn(Optional.empty());
 
             assertThrows(RecursoNoEncontradoException.class,
@@ -789,7 +789,7 @@ class SolicitudServiceTest {
         void should_listarPorResponsable_when_responsableConSolicitudes() {
             Solicitud s = Solicitud.builder().id(1L)
                     .estado(EstadoSolicitud.EN_ATENCION)
-                    .tipo(TipoSolicitud.CUPOS)
+                    .tipo(TipoSolicitud.SOLICITUD_CUPOS)
                     .estudiante(estudianteActivo)
                     .responsableAsignado(responsableActivo).build();
             when(solicitudRepository.findByResponsableAsignadoId(10L)).thenReturn(List.of(s));
@@ -864,7 +864,7 @@ class SolicitudServiceTest {
 
     private Solicitud buildSolicitud(Long id, EstadoSolicitud estado) {
         return Solicitud.builder().id(id).estado(estado)
-                .tipo(TipoSolicitud.CUPOS).estudiante(estudianteActivo).build();
+                .tipo(TipoSolicitud.SOLICITUD_CUPOS).estudiante(estudianteActivo).build();
     }
 
     // Este método fabrica objetos Historial listos para usar y así evitar

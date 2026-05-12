@@ -26,9 +26,10 @@ public class SolicitudController {
 
     // 1. Registrar (Mantenemos tu CrearSolicitudDTO)
     @PostMapping
-    public ResponseEntity<String> registrar(@RequestBody CrearSolicitudDTO dto) {
+    public ResponseEntity<SolicitudDTO> registrar(@RequestBody CrearSolicitudDTO dto) {
         Solicitud nueva = solicitudService.registrarSolicitud(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Solicitud registrada con éxito, su radicado es: "+nueva.getId());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(solicitudService.obtenerPorId(nueva.getId()));
     }
 
     // 2. Listar todas convirtiendo a DTO
