@@ -21,10 +21,11 @@ public class JwtUtil {
 
     // Genera un token JWT con el username y el rol del usuario
     // Este token se entrega al usuario cuando hace login exitoso
-    public String generarToken(String username, String rol) {
+    public String generarToken(Long id, String username, String rol) {
         return Jwts.builder()
                 .subject(username)           // quién es el usuario
                 .claim("rol", rol)           // qué rol tiene
+                .claim("id", id)
                 .issuedAt(new Date())        // cuándo se generó
                 .expiration(new Date(System.currentTimeMillis() + EXPIRACION)) // cuándo expira
                 .signWith(key)               // firma con la clave secreta

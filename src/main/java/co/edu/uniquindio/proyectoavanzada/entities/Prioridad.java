@@ -17,6 +17,7 @@ public class Prioridad {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private NivelSolicitud nivel; // ALTA, MEDIA, BAJA
     private String impactoAcademico;
     private String justificacion;

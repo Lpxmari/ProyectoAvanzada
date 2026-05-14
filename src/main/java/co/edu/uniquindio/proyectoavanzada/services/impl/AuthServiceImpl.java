@@ -43,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Si todo está bien, generamos y retornamos el token JWT
         return jwtUtil.generarToken(
+                usuario.getId(),
                 usuario.getUsername(),
                 usuario.getRol()
         );

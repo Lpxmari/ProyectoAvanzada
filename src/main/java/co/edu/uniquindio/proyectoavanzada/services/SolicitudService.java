@@ -7,6 +7,8 @@ import co.edu.uniquindio.proyectoavanzada.dto.SolicitudDTO;
 import co.edu.uniquindio.proyectoavanzada.entities.*;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.EstadoSolicitud;
 import co.edu.uniquindio.proyectoavanzada.dto.CierreDTO;
+import co.edu.uniquindio.proyectoavanzada.entities.enums.NivelSolicitud;
+import co.edu.uniquindio.proyectoavanzada.entities.enums.TipoSolicitud;
 
 import java.util.List;
 
@@ -33,4 +35,6 @@ public interface SolicitudService {
     Solicitud marcarComoAtendida(Long id, String observaciones);
 
     List<SolicitudDTO> listarPorResponsable(Long responsableId);
+
+    List<SolicitudDTO> filtrar(String responsable, NivelSolicitud nivel, EstadoSolicitud estado, TipoSolicitud tipoSolicitud);
 }

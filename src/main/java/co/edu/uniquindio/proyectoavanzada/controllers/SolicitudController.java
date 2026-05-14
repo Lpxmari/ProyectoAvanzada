@@ -4,6 +4,7 @@ import co.edu.uniquindio.proyectoavanzada.dto.*;
 import co.edu.uniquindio.proyectoavanzada.entities.*;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.EstadoSolicitud;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.NivelSolicitud;
+import co.edu.uniquindio.proyectoavanzada.entities.enums.TipoSolicitud;
 import co.edu.uniquindio.proyectoavanzada.services.SolicitudService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -129,5 +130,21 @@ public class SolicitudController {
             @RequestParam(required = false) String observaciones) {
         solicitudService.marcarComoAtendida(id, observaciones);
         return ResponseEntity.ok("Solicitud marcada como atendida correctamente");
+    }
+
+    @GetMapping("/filtrar")
+    public ResponseEntity<List<SolicitudDTO>> filtrar(
+            @RequestParam(required = false) String responsable,
+            @RequestParam(required = false) NivelSolicitud nivel,
+            @RequestParam(required = false) EstadoSolicitud estado,
+            @RequestParam(required = false) TipoSolicitud tipoSolicitud
+    ) {
+        List<SolicitudDTO> solicitudes = solicitudService.filtrar(
+                responsable,
+                nivel,
+                estado,
+                tipoSolicitud
+        );
+        return ResponseEntity.ok(solicitudes);
     }
 }

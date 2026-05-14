@@ -3,6 +3,8 @@ package co.edu.uniquindio.proyectoavanzada.services.impl;
 import co.edu.uniquindio.proyectoavanzada.dto.*;
 import co.edu.uniquindio.proyectoavanzada.entities.*;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.EstadoSolicitud;
+import co.edu.uniquindio.proyectoavanzada.entities.enums.NivelSolicitud;
+import co.edu.uniquindio.proyectoavanzada.entities.enums.TipoSolicitud;
 import co.edu.uniquindio.proyectoavanzada.excepciones.RecursoNoEncontradoException;
 import co.edu.uniquindio.proyectoavanzada.repositories.EstudianteRepository;
 import co.edu.uniquindio.proyectoavanzada.repositories.HistorialRepository;
@@ -21,7 +23,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor 
 
 public class SolicitudServiceImpl implements SolicitudService {
-
 
     private final SolicitudRepository solicitudRepository;
     private final ResponsableRepository responsableRepository;
@@ -249,6 +250,13 @@ public class SolicitudServiceImpl implements SolicitudService {
     @Override
     public List<SolicitudDTO> listarPorResponsable(Long responsableId) {
         return solicitudRepository.findByResponsableAsignadoId(responsableId).stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SolicitudDTO> filtrar(String responsable, NivelSolicitud nivel, EstadoSolicitud estado, TipoSolicitud tipoSolicitud) {
+        return solicitudRepository.filtrar(responsable, nivel, estado, tipoSolicitud).stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
