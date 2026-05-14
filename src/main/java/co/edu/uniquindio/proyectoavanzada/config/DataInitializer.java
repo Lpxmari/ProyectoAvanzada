@@ -5,6 +5,7 @@ import co.edu.uniquindio.proyectoavanzada.entities.Estudiante;
 import co.edu.uniquindio.proyectoavanzada.entities.Responsable;
 import co.edu.uniquindio.proyectoavanzada.entities.enums.ProgramaAcademico;
 import co.edu.uniquindio.proyectoavanzada.repositories.UsuarioRepository;
+import co.edu.uniquindio.proyectoavanzada.repositories.ResponsableRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,6 +53,18 @@ public class DataInitializer implements CommandLineRunner {
                 .isDeleted(false)
                 .build();
 
+
+        Responsable asistente = Responsable.builder()
+                .username("asistente1")
+                .password(passwordEncoder.encode("resp456"))
+                .activo(true)
+                .nombreCompleto("Ana García")
+                .cargo("Asistente de Secretaria de Facultad")
+                .isDeleted(false)
+                .build();
+
+
+
         // ── ESTUDIANTES ──
         Estudiante estudiante1 = Estudiante.builder()
                 .username("est001")
@@ -74,6 +87,7 @@ public class DataInitializer implements CommandLineRunner {
         usuarioRepository.save(admin);
         usuarioRepository.save(coordinador);
         usuarioRepository.save(secretaria);
+        usuarioRepository.save(asistente);
         usuarioRepository.save(estudiante1);
         usuarioRepository.save(estudiante2);
 
