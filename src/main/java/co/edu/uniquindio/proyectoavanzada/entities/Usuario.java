@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@Setter
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
 

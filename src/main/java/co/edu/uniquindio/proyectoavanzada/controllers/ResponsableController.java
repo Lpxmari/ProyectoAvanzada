@@ -30,19 +30,19 @@ public class ResponsableController {
         return ResponseEntity.ok(responsableService.obtenerPorId(id));
     }
 
-    // Crear nuevo responsable
     @PostMapping
-    public ResponseEntity<ResponsableDTO> crear(@RequestBody Responsable responsable) {
-        ResponsableDTO creado = responsableService.crearResponsable(responsable);
+    public ResponseEntity<ResponsableDTO> crear(@RequestBody ResponsableDTO responsableDTO) {
+        // Usamos la variable 'responsableDTO' que viene en el parámetro
+        ResponsableDTO creado = responsableService.crearResponsable(responsableDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
-    // Actualizar responsable
     @PutMapping("/{id}")
     public ResponseEntity<ResponsableDTO> actualizar(
             @PathVariable Long id,
-            @RequestBody Responsable responsable) {
-        return ResponseEntity.ok(responsableService.actualizarResponsable(id, responsable));
+            @RequestBody ResponsableDTO responsableDTO) {
+        // Usamos la variable 'responsableDTO'
+        return ResponseEntity.ok(responsableService.actualizarResponsable(id, responsableDTO));
     }
 
     // Eliminar responsable
