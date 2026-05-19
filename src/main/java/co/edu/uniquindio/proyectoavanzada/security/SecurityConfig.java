@@ -30,16 +30,39 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/responsables/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/solicitudes").hasAnyRole("ESTUDIANTE", "ADMIN")
-                        .requestMatchers("/api/solicitudes/*/responsable").hasRole("ADMIN")
-                        .requestMatchers("/api/solicitudes/*/priorizar").hasRole("ADMIN")
-                        .requestMatchers("/api/solicitudes/*/cerrar").hasAnyRole("RESPONSABLE", "ADMIN")
-                        .requestMatchers("/api/solicitudes/*/atender").hasAnyRole("RESPONSABLE", "ADMIN")
-                        .requestMatchers("/api/solicitudes/estudiante/*").hasAnyRole("ESTUDIANTE", "ADMIN")
-                        .requestMatchers("/api/solicitudes/responsable/*").hasAnyRole("RESPONSABLE", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/solicitudes/**").hasAnyRole("RESPONSABLE", "ADMIN")
+
+                        .requestMatchers("/api/responsables/atender/**")
+                        .hasAnyRole("RESPONSABLE", "ADMIN")
+
+                        .requestMatchers("/api/responsables/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/solicitudes")
+                        .hasAnyRole("ESTUDIANTE", "ADMIN")
+
+                        .requestMatchers("/api/solicitudes/*/responsable")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers("/api/solicitudes/*/priorizar")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers("/api/solicitudes/*/cerrar")
+                        .hasAnyRole("RESPONSABLE", "ADMIN")
+
+                        .requestMatchers("/api/solicitudes/*/atender")
+                        .hasAnyRole("RESPONSABLE", "ADMIN")
+
+                        .requestMatchers("/api/solicitudes/estudiante/*")
+                        .hasAnyRole("ESTUDIANTE", "ADMIN")
+
+                        .requestMatchers("/api/solicitudes/responsable/*")
+                        .hasAnyRole("RESPONSABLE", "ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/solicitudes/**")
+                        .hasAnyRole("RESPONSABLE", "ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
