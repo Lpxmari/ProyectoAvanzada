@@ -21,6 +21,8 @@ public class Historial {
     private Long id;
 
     private LocalDateTime fechaHora;
+
+    @Column(columnDefinition = "TEXT")
     private String observaciones;
 
     @Enumerated(EnumType.STRING)
