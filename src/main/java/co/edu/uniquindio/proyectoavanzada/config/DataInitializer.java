@@ -39,7 +39,7 @@ public class DataInitializer implements CommandLineRunner {
                 .password(passwordEncoder.encode("resp123"))
                 .activo(true)
                 .nombreCompleto("Carlos Pérez")
-                .cargo("coordinador")
+                .cargo("coordinador")   
                 .isDeleted(false)
                 .build();
 

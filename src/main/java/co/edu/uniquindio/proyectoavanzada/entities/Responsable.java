@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
+
 public class Responsable extends Usuario {
 
     private String nombreCompleto;
     private String cargo;
-
     private boolean isDeleted;
     private LocalDateTime deletedAt;
 }
