@@ -1,7 +1,7 @@
 #
 # Etapa de construcción
 #
-FROM gradle:8.7-jdk21 AS build
+FROM gradle:8.14-jdk21 AS build
 USER gradle
 WORKDIR /home/gradle/project
 
