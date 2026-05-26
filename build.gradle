@@ -35,7 +35,7 @@ dependencies {
     // Para la persistencia de datos y mapeo objeto-relacional (ORM)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // Base de datos
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'org.postgresql:postgresql:42.7.8'
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -51,10 +51,4 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-    jvmArgs '-XX:+EnableDynamicAgentLoading'
-    jvmArgs '-Xshare:off'
 }
